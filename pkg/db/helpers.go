@@ -6,31 +6,31 @@ import (
 	"strings"
 )
 
-type Helpers struct {
+type Helper struct {
 }
 
-func (this *Helpers) GenerateInsertQuery(table string, s interface{}) (string, error) {
-	v := reflect.ValueOf(s)
-	if v.Kind() == reflect.Ptr {
-		v = v.Elem()
+func (this *Helper) GenerateInsertQuery(tableName string, s interface{}) (string, error) {
+	value := reflect.ValueOf(s)
+	if value.Kind() == reflect.Ptr {
+		value = value.Elem()
 	}
-	if v.Kind() != reflect.Struct {
+	if value.Kind() != reflect.Struct {
 		return "", fmt.Errorf("expected a struct, got %T", s)
 	}
 
 	var columns []string
 	var values []string
 
-	for i := 0; i < v.NumField(); i++ {
-		value := fmt.Sprint(v.Field(i))
-		tag := v.Type().Field(i).Tag.Get("db")
+	for i := 0; i < value.NumField(); i++ {
+		fieldValue := fmt.Sprint(value.Field(i))
+		tag := value.Type().Field(i).Tag.Get("db")
 
 		if tag == "" || tag == "-" {
 			continue // скипаем не db тэги
 		}
 
 		columns = append(columns, tag)
-		values = append(values, value)
+		values = append(values, fieldValue)
 	}
 
 	if len(columns) == 0 {
@@ -39,7 +39,7 @@ func (this *Helpers) GenerateInsertQuery(table string, s interface{}) (string, e
 
 	query := fmt.Sprintf(
 		"INSERT INTO %s (%s) VALUES (%s)",
-		table,
+		tableName,
 		strings.Join(columns, ", "),
 		strings.Join(values, ", "),
 	)

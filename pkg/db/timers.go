@@ -1,18 +1,14 @@
 package db
 
 import (
-	"errors"
 	"fmt"
 	"log"
-	"os"
 	"shadowflade/timers/pkg/interfaces"
-	"time"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gofor-little/env"
 	"github.com/jmoiron/sqlx"
 )
-
 
 type Db struct {
 	db       *sqlx.DB
@@ -46,13 +42,38 @@ func (this *Db) connect() (*sqlx.DB, error) {
 	return db, nil
 }
 
-func (this *Db) createTimer(timer interfaces.Timer) {
+func (this *Db) CreateTimer(timer interfaces.Timer) (int64, error) {
 	db, err := this.connect()
 
 	if err != nil {
 		log.Fatal(err)
 	}
 	transaction := db.MustBegin()
-	res := transaction.MustExec("insert into timers (start
+	dbHelper := Helper{}
+	query, err := dbHelper.GenerateInsertQuery("timers", timer)
+	if err != nil {
+		fmt.Printf("Error generating insert query")
+		panic(err)
+	}
+	res := transaction.MustExec(query)
+
+	newId, err := res.LastInsertId()
+
+	if err != nil {
+		fmt.Printf(err.Error())
+		panic(err)
+	}
+
+	if newId > 0 {
+		commitErr := transaction.Commit()
+		if commitErr != nil {
+			fmt.Printf(commitErr.Error())
+			panic(commitErr.Error())
+		}
+
+		return newId, nil
+	}
+
+	return 0, nil
 
 }
