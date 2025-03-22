@@ -5,14 +5,13 @@ import (
 	"net/http"
 	"shadowflade/timers/global"
 	"shadowflade/timers/pkg/handlers"
+	"html/template"
 )
 
 func main() {
 
-	http.Handle("createTimer",handlers.TimerHandler)
-	log.Fatal(http.ListenAndServe(":" + global.PORT , nil))
+	timerHandler := handlers.TimerHandler{}
+	http.Handle("/createTimer", http.HandlerFunc(timerHandler.Create))
+	http.Handle("/", http.HandlerFunc()
+	log.Fatal(http.ListenAndServe(":"+global.PORT, nil))
 }
-func ServerHandler() {
-
-}
-

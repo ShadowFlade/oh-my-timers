@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"shadowflade/timers/pkg/db"
 	"shadowflade/timers/pkg/interfaces"
@@ -11,7 +10,7 @@ import (
 type TimerHandler struct {
 }
 
-func (this *TimerHandler) Create(w http.ResponseWriter, r http.Request) {
+func (this *TimerHandler) Create(w http.ResponseWriter, r *http.Request) {
 	db := db.Db{}
 	var body []byte
 	r.Body.Read(body)
@@ -42,7 +41,7 @@ func (this *TimerHandler) Create(w http.ResponseWriter, r http.Request) {
 		panic(err.Error())
 	}
 
-	fmt.Fprintf(w, string(responseJson))
+	w.Write(responseJson)
 }
 
 func handlerThoseFuckingErrors(isTimerStartOk bool, isTimerEndOk bool, isUserIDOk bool) {
@@ -56,4 +55,3 @@ func handlerThoseFuckingErrors(isTimerStartOk bool, isTimerEndOk bool, isUserIDO
 		panic("No use id provided")
 	}
 }
-
