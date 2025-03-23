@@ -9,7 +9,11 @@ import (
 
 func main() {
 	timerHandler := handlers.TimerHandler{}
-	http.Handle("/createTimer", http.HandlerFunc(timerHandler.Create))
-	http.Handle("/", http.HandlerFunc(timerHandler.RenderUserTimers))
-	log.Fatal(http.ListenAndServe(":"+global.PORT, nil))
+	fileServer := http.FileServer(http.Dir("./assets/"))
+	mux := http.NewServeMux()
+	mux.Handle("/createTimer", http.HandlerFunc(timerHandler.CreateTimer))
+	mux.Handle("/", http.HandlerFunc(timerHandler.RenderUserTimers))
+	mux.Handle("/assets/", http.StripPrefix("/assets", fileServer))
+
+	log.Fatal(http.ListenAndServe(":"+global.PORT, mux))
 }

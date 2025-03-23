@@ -1,5 +1,7 @@
 {{ block "timers" . }}
-	{{ range . }}
-	{{ template "timer"}}
+	<h5>Timers</h5>
+	{{ range .Items }}
+	{{ template "timer" .}}
 	{{ end }}
+	{{ template "newTimer" .}}
 {{ end }}

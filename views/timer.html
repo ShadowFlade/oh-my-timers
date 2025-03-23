@@ -1,5 +1,8 @@
 {{ block "timer" .}}
-<div class="timer">
-	<div class="timer__wrapper"></div>
+<h6>Timer</h6>
+<div class="timer js-timer" data-state="empty" data-user-id="{{.userID}}">
+	<div class="timer__wrapper">
+		{{ . }}
+	</div>
 </div>
 {{ end }}

@@ -1,4 +1,15 @@
 {{block "index" . }}
-{{ template "timers" . }}
-<div>Hello</div>
-{{ end }}
+<html>
+
+<head>
+	<link rel="stylesheet" href="/assets/style.css">
+	<script src="/assets/script.js"></script>
+</head>
+
+<body>
+	<div>Hello</div>
+	{{ template "timers" . }}
+	{{ end }}
+</body>
+
+</html>

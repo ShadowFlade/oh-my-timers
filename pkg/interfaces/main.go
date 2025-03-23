@@ -7,3 +7,9 @@ type Timer struct {
 	Title  string `db:"title"`
 	Color  string `db:"color"`
 }
+
+type TimerTemplate struct {
+	Items        []Timer
+	IsMoreThan10 bool
+	UserID       int
+}

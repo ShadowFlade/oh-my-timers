@@ -3,12 +3,11 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
-	"html/template"
-	"log"
 	"net/http"
 	"shadowflade/timers/global"
 	DB "shadowflade/timers/pkg/db"
 	"shadowflade/timers/pkg/interfaces"
+	"shadowflade/timers/pkg/views"
 	"strconv"
 )
 
@@ -18,6 +17,9 @@ type TimerHandler struct {
 func (this *TimerHandler) RenderUserTimers(w http.ResponseWriter, r *http.Request) {
 
 	timersDb := DB.Timer{}
+	views := views.Views{}
+
+	templates := views.GetTemplates()
 	var userId int
 	var userIdVal string
 
@@ -28,26 +30,63 @@ func (this *TimerHandler) RenderUserTimers(w http.ResponseWriter, r *http.Reques
 		userIdVal = userIdCookie.Value
 	}
 
+	fmt.Print(userIdCookie.Value, " COOKIE USER ID!!")
+
 	userId, err = strconv.Atoi(userIdVal)
 	fmt.Print(userId)
 
-	templates, err := template.ParseGlob("views/*.html")
-	newTemplates := template.Must(templates, err)
-
 	if userId == 0 {
 		userId = int(this.createUser("USER", w))
-		templates.ExecuteTemplate(w, "index", make([]interfaces.Timer, 0))
+		http.SetCookie(w, &http.Cookie{Name: global.COOKIE_USER_ID_NAME, Value: strconv.Itoa(userId)})
+		templates.ExecuteTemplate(
+			w,
+			"index",
+			interfaces.TimerTemplate{
+				Items:        make([]interfaces.Timer, 0),
+				IsMoreThan10: false,
+				UserID:       userId,
+			},
+		)
 	}
 	userTimers := timersDb.GetAllUsersTimers(userId)
-	if err != nil {
-		panic(err.Error())
-	}
-	log.Print(userTimers, newTemplates)
-	templates.ExecuteTemplate(w, "index", userTimers)
+
+	templates.ExecuteTemplate(w, "index", interfaces.TimerTemplate{
+		Items:        userTimers,
+		IsMoreThan10: false,
+		UserID:       userId,
+	})
 
 }
 
-func (this *TimerHandler) Create(w http.ResponseWriter, r *http.Request) {
+func (this *TimerHandler) CreateTimer(w http.ResponseWriter, r *http.Request) {
+	db := DB.Db{}
+	views := views.Views{}
+	templates := views.GetTemplates()
+	cookie, err := r.Cookie(global.COOKIE_USER_ID_NAME)
+	if err != nil {
+		panic(err.Error())
+	}
+	cookieVal := cookie.Value
+	userID, err := strconv.Atoi(cookieVal)
+	if err != nil {
+		panic(err.Error())
+	}
+	newTimer := interfaces.Timer{
+		UserID: int32(userID),
+	}
+	newTimerID, err := db.CreateTimer(newTimer)
+
+	if err != nil {
+		panic(err.Error())
+	}
+
+	templates.ExecuteTemplate(w, "timer", map[string]interface{}{
+		"userId": userID,
+		"id":     newTimerID,
+	})
+}
+
+func (this *TimerHandler) UpdateTimer(w http.ResponseWriter, r *http.Request) {
 	db := DB.Db{}
 	var body []byte
 	r.Body.Read(body)
@@ -96,7 +135,7 @@ func handlerThoseFuckingErrors(isTimerStartOk bool, isTimerEndOk bool, isUserIDO
 func (this *TimerHandler) createUser(name string, w http.ResponseWriter) int64 {
 	userDb := DB.User{}
 	newUserID := userDb.CreateUser(name)
-	cookie := http.Cookie{Name: "userID", Value: string(newUserID)}
+	cookie := http.Cookie{Name: "userID", Value: strconv.Itoa(int(newUserID))}
 	http.SetCookie(w, &cookie)
 	return newUserID
 }
