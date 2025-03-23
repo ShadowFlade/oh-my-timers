@@ -1,4 +1,6 @@
 main
 /tmp
 .env
+*tmp*
 readme_private.md
+.idea
