@@ -19,18 +19,24 @@ func (this *Helper) GenerateInsertQuery(tableName string, s interface{}) (string
 	}
 
 	var columns []string
-	var values []string
+	var values string
 
 	for i := 0; i < value.NumField(); i++ {
 		fieldValue := fmt.Sprint(value.Field(i))
+		fmt.Printf(fieldValue, " FIELD VALUE !!!")
 		tag := value.Type().Field(i).Tag.Get("db")
+		sb := strings.Builder{}
 
 		if tag == "" || tag == "-" {
 			continue // скипаем не db тэги
 		}
 
 		columns = append(columns, tag)
-		values = append(values, fieldValue)
+		if fieldValue == "" {
+			sb.WriteString("null")
+		} else {
+			sb.WriteString(fieldValue)
+		}
 	}
 
 	if len(columns) == 0 {
@@ -41,7 +47,7 @@ func (this *Helper) GenerateInsertQuery(tableName string, s interface{}) (string
 		"INSERT INTO %s (%s) VALUES (%s)",
 		tableName,
 		strings.Join(columns, ", "),
-		strings.Join(values, ", "),
+		values,
 	)
 	return query, nil
 }

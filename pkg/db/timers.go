@@ -48,9 +48,10 @@ func (this *Db) CreateTimer(timer interfaces.Timer) (int64, error) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	transaction := this.db.MustBegin()
+	transaction := db.db.MustBegin()
 	dbHelper := Helper{}
-	query, err := dbHelper.GenerateInsertQuery("timers", timer)
+	query, err := dbHelper.GenerateInsertQuery(db.TimersTable, timer)
+	fmt.Print(query, " QUERY!!!!")
 	if err != nil {
 		fmt.Printf("Error generating insert query")
 		panic(err)

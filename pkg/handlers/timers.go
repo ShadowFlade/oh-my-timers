@@ -59,6 +59,7 @@ func (this *TimerHandler) RenderUserTimers(w http.ResponseWriter, r *http.Reques
 }
 
 func (this *TimerHandler) CreateTimer(w http.ResponseWriter, r *http.Request) {
+
 	db := DB.Db{}
 	views := views.Views{}
 	templates := views.GetTemplates()
@@ -81,7 +82,7 @@ func (this *TimerHandler) CreateTimer(w http.ResponseWriter, r *http.Request) {
 	}
 
 	templates.ExecuteTemplate(w, "timer", map[string]interface{}{
-		"userId": userID,
+		"userID": userID,
 		"id":     newTimerID,
 	})
 }
