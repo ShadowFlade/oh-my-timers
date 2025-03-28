@@ -30,10 +30,7 @@ func (this *TimerHandler) RenderUserTimers(w http.ResponseWriter, r *http.Reques
 		userIdVal = userIdCookie.Value
 	}
 
-	fmt.Print(userIdCookie.Value, " COOKIE USER ID!!")
-
 	userId, err = strconv.Atoi(userIdVal)
-	fmt.Print(userId)
 
 	if userId == 0 {
 		userId = int(this.createUser("USER", w))
@@ -81,10 +78,11 @@ func (this *TimerHandler) CreateTimer(w http.ResponseWriter, r *http.Request) {
 		panic(err.Error())
 	}
 
-	templates.ExecuteTemplate(w, "timer", map[string]interface{}{
+	err = templates.ExecuteTemplate(w, "timer", map[string]interface{}{
 		"userID": userID,
 		"id":     newTimerID,
 	})
+	fmt.Print(err.Error())
 }
 
 func (this *TimerHandler) UpdateTimer(w http.ResponseWriter, r *http.Request) {
