@@ -30,7 +30,7 @@ func (this *Timer) GetAllUsersTimers(userID int) []interfaces.Timer {
 	var userTimers []interfaces.Timer
 	for res.Next() {
 		var userTimer interfaces.Timer
-		err := res.StructScan(userTimer)
+		err := res.StructScan(&userTimer)
 		if err != nil {
 			log.Fatal(err.Error())
 		}
@@ -44,37 +44,47 @@ func (this *Timer) GetAllUsersTimers(userID int) []interfaces.Timer {
 func (this *Db) CreateTimer(timer interfaces.Timer) (int64, error) {
 	db := Db{}
 	err := db.Connect()
-
 	if err != nil {
-		log.Fatal(err)
-	}
-	transaction := db.db.MustBegin()
-	dbHelper := Helper{}
-	query, err := dbHelper.GenerateInsertQuery(db.TimersTable, timer)
-	fmt.Print(query, " QUERY!!!!")
-	if err != nil {
-		fmt.Printf("Error generating insert query")
-		panic(err)
-	}
-	res := transaction.MustExec(query)
-
-	newId, err := res.LastInsertId()
-
-	if err != nil {
-		fmt.Printf(err.Error())
-		panic(err)
+		return 0, fmt.Errorf("failed to connect to database: %w", err)
 	}
 
-	if newId > 0 {
-		commitErr := transaction.Commit()
-		if commitErr != nil {
-			fmt.Printf(commitErr.Error())
-			panic(commitErr.Error())
+	tx, err := db.db.Beginx() // Use Beginx instead of MustBegin for better error handling
+	if err != nil {
+		return 0, fmt.Errorf("failed to begin transaction: %w", err)
+	}
+
+	defer func() {
+		if tx != nil {
+			tx.Rollback()
 		}
+	}()
 
-		return newId, nil
+	query := fmt.Sprintf("INSERT INTO timers (start, end, user_id, title, color) VALUES ('%s', '%s', %d, '%s', '%s');", timer.Start, timer.End, timer.UserID, timer.Title, timer.Color)
+	result, err := tx.Exec(query)
+
+	if err != nil {
+		return 0, fmt.Errorf("failed to execute query: %w", err)
 	}
 
-	return 0, nil
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return 0, fmt.Errorf("failed to get rows affected: %w", err)
+	}
 
+	if rowsAffected == 0 {
+		return 0, fmt.Errorf("no rows were inserted")
+	}
+
+	newId, err := result.LastInsertId()
+	if err != nil {
+		return 0, fmt.Errorf("failed to get last insert ID: %w", err)
+	}
+
+	if err := tx.Commit(); err != nil {
+		return 0, fmt.Errorf("failed to commit transaction: %w", err)
+	}
+
+	// Set tx to nil to prevent defer from rolling back
+	tx = nil
+	return newId, nil
 }

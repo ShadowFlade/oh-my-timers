@@ -3,7 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
-	"shadowflade/timers/global"
+	"shadowflade/timers/pkg/global"
 	"shadowflade/timers/pkg/handlers"
 )
 

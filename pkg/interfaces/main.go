@@ -6,6 +6,7 @@ type Timer struct {
 	UserID int32  `db:"user_id"`
 	Title  string `db:"title"`
 	Color  string `db:"color"`
+	Id     int64  `db:"id"`
 }
 
 type TimerTemplate struct {

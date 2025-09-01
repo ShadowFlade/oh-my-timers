@@ -2,6 +2,7 @@ package db
 
 import (
 	"fmt"
+	"log"
 	"reflect"
 	"strings"
 )
@@ -11,9 +12,11 @@ type Helper struct {
 
 func (this *Helper) GenerateInsertQuery(tableName string, s interface{}) (string, error) {
 	value := reflect.ValueOf(s)
+
 	if value.Kind() == reflect.Ptr {
 		value = value.Elem()
 	}
+
 	if value.Kind() != reflect.Struct {
 		return "", fmt.Errorf("expected a struct, got %T", s)
 	}
@@ -23,7 +26,6 @@ func (this *Helper) GenerateInsertQuery(tableName string, s interface{}) (string
 
 	for i := 0; i < value.NumField(); i++ {
 		fieldValue := fmt.Sprint(value.Field(i))
-		// fmt.Printf(fieldValue, " FIELD VALUE !!!")
 		tag := value.Type().Field(i).Tag.Get("db")
 
 		if tag == "" || tag == "-" {
@@ -31,8 +33,11 @@ func (this *Helper) GenerateInsertQuery(tableName string, s interface{}) (string
 		}
 
 		columns = append(columns, tag)
+
+		log.Print(fieldValue," FIELD VALUE")
+
 		if fieldValue == "" {
-			sb.WriteString("null,")
+			sb.WriteString(" ,")
 		} else {
 			sb.WriteString(fieldValue + ",")
 		}
@@ -42,14 +47,12 @@ func (this *Helper) GenerateInsertQuery(tableName string, s interface{}) (string
 		return "", fmt.Errorf("no fields with `db` tags found")
 	}
 	values := sb.String()
-	fmt.Println(string(values[len(values)-1:]), " LAST CHAR")
-	fmt.Printf("%b\n", string(values[len(values)-1:]) == ",")
 
 	if string(values[len(values)-1:]) == "," {
 		values = values[:len(values)-1]
 	}
 	query := fmt.Sprintf(
-		"INSERT INTO %s (%s) VALUES (%s)",
+		"INSERT INTO %s (%s) VALUES (%s);",
 		tableName,
 		strings.Join(columns, ", "),
 		values,

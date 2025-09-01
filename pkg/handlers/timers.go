@@ -4,11 +4,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"shadowflade/timers/global"
+	"shadowflade/timers/pkg/global"
 	DB "shadowflade/timers/pkg/db"
 	"shadowflade/timers/pkg/interfaces"
 	"shadowflade/timers/pkg/views"
 	"strconv"
+	"time"
 )
 
 type TimerHandler struct {
@@ -61,17 +62,26 @@ func (this *TimerHandler) CreateTimer(w http.ResponseWriter, r *http.Request) {
 	views := views.Views{}
 	templates := views.GetTemplates()
 	cookie, err := r.Cookie(global.COOKIE_USER_ID_NAME)
+
 	if err != nil {
 		panic(err.Error())
 	}
+
 	cookieVal := cookie.Value
 	userID, err := strconv.Atoi(cookieVal)
+
 	if err != nil {
 		panic(err.Error())
 	}
+
 	newTimer := interfaces.Timer{
 		UserID: int32(userID),
+		Start: time.Now().Format(global.MYSQL_DATETIME_FORMAT),
+		End: time.Now().Format(global.MYSQL_DATETIME_FORMAT),
+		Title: "your mom",
+		Color: "red",
 	}
+
 	newTimerID, err := db.CreateTimer(newTimer)
 
 	if err != nil {
@@ -82,7 +92,7 @@ func (this *TimerHandler) CreateTimer(w http.ResponseWriter, r *http.Request) {
 		"userID": userID,
 		"id":     newTimerID,
 	})
-	fmt.Print(err.Error())
+	fmt.Print(err.Error(),userID,newTimerID)
 }
 
 func (this *TimerHandler) UpdateTimer(w http.ResponseWriter, r *http.Request) {
