@@ -1,7 +1,7 @@
 {{ block "timers" . }}
     {{ template "newTimer" .}}
 
-    <div class="timers">
+    <div class="timers js-timers">
         {{ range .Items }}
             {{ template "timer" .}}
         {{ end }}

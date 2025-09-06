@@ -1,10 +1,11 @@
 {{ block "timer" .}}
 <div class="timer js-timer" data-id="{{.Id}}"
-    data-running-since="{{.RunningSince}}"
+    data-running-since="{{.RunningSince.Value}}"
     data-duration="{{.Duration}}"
-    data-user-id="{{.UserId}}"
+    data-user-id="{{.UserID}}"
     data-color="{{.Color}}"
     data-id="{{.Id}}"
+    data-paused-at="{{.PausedAt.Value}}"
 >
         <form id="timerForm" method="PATCH" class="form js-form">
             <button type="button" id="deleteBtn" class="delete-btn js-delete-btn" title="Delete Timer">
@@ -17,7 +18,7 @@
                     type="text"
                     id="title"
                     name="title"
-                    placeholder="Title"
+                    placeholder="your mom"
                     class="input"
                     required
                     value="{{if .Title}}{{.Title}}{{end}}"
@@ -27,7 +28,7 @@
             <div class="timer-section">
                 <div class="timer-circle">
                     <div class="timer-display js-timer-display" id="timerDisplay">
-                        00:00
+                        {{.FormattedDuration}}
                     </div>
                 </div>
 
@@ -42,8 +43,7 @@
 
                     <button
                         type="button"
-                        id="stopBtn"
-                        class="btn btn-secondary js-stop-btn"
+                        class="btn btn-secondary js-pause-btn"
                         disabled
                     >
                         Pause

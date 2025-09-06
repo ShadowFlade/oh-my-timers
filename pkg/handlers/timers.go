@@ -1,15 +1,16 @@
 package handlers
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	DB "shadowflade/timers/pkg/db"
 	"shadowflade/timers/pkg/global"
 	"shadowflade/timers/pkg/interfaces"
 	"shadowflade/timers/pkg/views"
 	"strconv"
-	"time"
 )
 
 type TimerHandler struct {
@@ -74,13 +75,7 @@ func (this *TimerHandler) CreateTimer(w http.ResponseWriter, r *http.Request) {
 		panic(err.Error())
 	}
 
-	newTimer := interfaces.Timer{
-		UserID:    int32(userID),
-		StartTime: time.Now().Format(global.MYSQL_DATETIME_FORMAT),
-		EndTime:   time.Now().Format(global.MYSQL_DATETIME_FORMAT),
-		Title:     "your mom",
-		Color:     "red",
-	}
+	newTimer := interfaces.NewTimer(int32(userID), "your mom", "red")
 
 	newTimerID, err := db.CreateTimer(newTimer)
 
@@ -99,16 +94,16 @@ func (this *TimerHandler) CreateTimer(w http.ResponseWriter, r *http.Request) {
 
 func (this *TimerHandler) PauseTimer(w http.ResponseWriter, r *http.Request) {
 	db := DB.Db{}
-	var body []byte
-	r.Body.Read(body)
+
+	body, _ := io.ReadAll(r.Body)
 	var response map[string]interface{}
 	json.Unmarshal(body, &response)
 	timerId := response["timer_id"]
-	timerId, _ = strconv.Atoi(timerId.(string))
-
-	if timerId == nil {
+	fmt.Println(timerId, " TImer id")
+	if timerId == 0 || timerId == nil {
 		return
 	}
+	timerId, _ = strconv.Atoi(timerId.(string))
 
 	newDuration, _ := db.PauseTimer(timerId.(int))
 	w.Write([]byte(string(newDuration)))
@@ -137,8 +132,8 @@ func (this *TimerHandler) UpdateTimer(w http.ResponseWriter, r *http.Request) {
 	handlerThoseFuckingErrors(isTimerStartOk, isTimerEndOk, isUserIDOk)
 
 	timer := interfaces.Timer{
-		StartTime: timerStart,
-		EndTime:   timerEnd,
+		StartTime: sql.NullString{String: timerStart, Valid: true},
+		EndTime:   sql.NullString{String: timerEnd, Valid: true},
 		UserID:    int32(userID),
 	}
 

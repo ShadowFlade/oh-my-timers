@@ -1,21 +1,11 @@
 document.addEventListener("DOMContentLoaded", () => {
-	const newTimerButton = document.querySelector(".js-new-timer__button");
-	
-	newTimerButton.addEventListener("click", async (e) => {
-		e.preventDefault();
-		const response = await fetch("/createTimer");
-		const newTimerHTML = await response.text()
-		/**
-		 * @type HTMLElement
-		 */
-		const blockToReplace = e.target.closest('.js-new-timer');
-		const parent = blockToReplace.parentElement
-		if(!blockToReplace.outerHTML) {
-			return;
-		}
-		blockToReplace.outerHTML = newTimerHTML
-		const newTimer = parent.querySelector(".js-timer")
-	})
-
-
+	const timersContainer = document.querySelector('.js-timers')
+	const timersManager = new TimerManager(timersContainer);
 })
+
+
+window.createTimer = '/createTimer';
+window.pauseTimer = '/pauseTimer';
+window.deleteTimer = '/deleteTimer';
+window.updateTimerTitle = '/updateTimerTitle';
+window.home = '/';

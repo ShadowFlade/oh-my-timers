@@ -3,7 +3,6 @@ package db
 import (
 	"fmt"
 	"log"
-	"shadowflade/timers/pkg/global"
 	"shadowflade/timers/pkg/interfaces"
 	"strconv"
 	"time"
@@ -23,7 +22,8 @@ func (this *Timer) GetAllUsersTimers(userID int) []interfaces.Timer {
 	tx := db.db.MustBegin()
 
 	userId := strconv.Itoa(userID)
-	res, err := db.db.Queryx(fmt.Sprintf("select * from timers where user_id = %s", userId))
+	fmt.Println(userID)
+	res, err := db.db.Queryx(fmt.Sprintf("select * from timers where user_id = %s order by start", userId))
 
 	if err != nil {
 		panic(err.Error())
@@ -31,7 +31,7 @@ func (this *Timer) GetAllUsersTimers(userID int) []interfaces.Timer {
 
 	var userTimers []interfaces.Timer
 	for res.Next() {
-		var userTimer interfaces.Timer
+		userTimer := interfaces.NewTimer(0, "", "")
 		err := res.StructScan(&userTimer)
 		if err != nil {
 			log.Fatal(err.Error())
@@ -104,51 +104,58 @@ func (this *Db) PauseTimer(timerId int) (int64, error) {
 		return 0, fmt.Errorf("failed to connect to database: %w", err)
 	}
 
-	if err != nil {
-		panic(err.Error())
+	userTimer := this.GetTimerById(timerId)
+	fmt.Println(userTimer, " user timer")
+
+	var start time.Time
+
+	if userTimer.RunningSince.Valid {
+		start = userTimer.RunningSince.Time
+	} else if userTimer.StartTime.Valid {
+		start = userTimer.StartTime.Time
 	}
 
-	userTimer := this.GetTimerById(timerId)
+	// Calculate elapsed time
+	elapsedSeconds := int(time.Since(start).Seconds())
+	newDuration := userTimer.Duration + int64(elapsedSeconds)
 
-	runningSince, _ := time.Parse(
-		global.MYSQL_DATETIME_FORMAT,
-		userTimer.RunningSince,
-	)
+	newPausedAt := time.Now()
 
-	sinceNow := time.Since(time.Now())
-	newPausedAt := time.Now().Format(global.MYSQL_DATETIME_FORMAT)
-	newDuration := runningSince.Add(sinceNow).Unix() + userTimer.Duration
-
-	updateTimerDurationQuery := fmt.Sprintf("update %s where id = %s set duration = %s, paused_at = %", this.TimersTable, timerId, newDuration, newPausedAt)
+	updateTimerDurationQuery := `
+		UPDATE timers
+		SET duration = ?, paused_at = ?
+		WHERE id = ?`
 
 	tx, err := db.db.Beginx()
 	if err != nil {
 		return 0, fmt.Errorf("failed to begin transaction: %w", err)
 	}
-
 	defer func() {
 		if tx != nil {
 			tx.Rollback()
 		}
 	}()
 
-	result, err := tx.Exec(updateTimerDurationQuery)
-
+	fmt.Println(newDuration, newPausedAt, timerId)
+	result, err := tx.Exec(
+		updateTimerDurationQuery,
+		newDuration,
+		newPausedAt,
+		timerId,
+	)
 	if err != nil {
-		return 0, fmt.Errorf("failed to execute query: %w", err)
+		log.Panicf("Query: %s failed to update timer: %w", updateTimerDurationQuery, err)
 	}
 
-	rowsAffected, err := result.RowsAffected()
-
-	if err != nil {
-		return 0, fmt.Errorf("failed to get rows affected: %w", err)
+	// Commit transaction
+	if err := tx.Commit(); err != nil {
+		log.Panicf("failed to commit: %w", err)
 	}
+	tx = nil // prevent rollback
 
-	if rowsAffected == 0 {
-		return 0, fmt.Errorf("no rows were inserted")
-	}
-
-	tx = nil
+	// Optional: get affected rows
+	rowsAffected, _ := result.RowsAffected()
+	fmt.Printf("Updated %d rows\n", rowsAffected)
 
 	return newDuration, nil
 
@@ -158,15 +165,19 @@ func (this *Db) GetTimerById(timerId int) interfaces.Timer {
 	db := Db{}
 	err := db.Connect()
 	res, err := db.db.Queryx(
-		fmt.Sprintf("select * from timers where id = %s", timerId),
+		fmt.Sprintf("select * from timers where id = %d;", int(timerId)),
 	)
 
 	if err != nil {
 		panic(err.Error())
 	}
-	var userTimer interfaces.Timer
-
-	err = res.StructScan(&userTimer)
+	userTimer := interfaces.NewTimer(0, "", "")
+	for res.Next() {
+		err := res.StructScan(&userTimer)
+		if err != nil {
+			log.Fatal(err.Error())
+		}
+	}
 
 	if err != nil {
 		log.Fatal(err.Error())
