@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"database/sql"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -119,37 +118,7 @@ func (this *TimerHandler) DeleteTimer(w http.ResponseWriter, r *http.Request) {
 }
 
 func (this *TimerHandler) UpdateTimer(w http.ResponseWriter, r *http.Request) {
-	db := DB.Db{}
-	var body []byte
-	r.Body.Read(body)
-	var response map[string]interface{}
-	json.Unmarshal(body, &response)
 
-	timerStart, isTimerStartOk := response["start"].(string)
-	timerEnd, isTimerEndOk := response["end"].(string)
-	userID, isUserIDOk := response["userId"].(int)
-
-	handlerThoseFuckingErrors(isTimerStartOk, isTimerEndOk, isUserIDOk)
-
-	timer := interfaces.Timer{
-		StartTime: sql.NullString{String: timerStart, Valid: true},
-		EndTime:   sql.NullString{String: timerEnd, Valid: true},
-		UserID:    int32(userID),
-	}
-
-	newId, err := db.CreateTimer(timer)
-	if err != nil {
-		panic(err.Error())
-	}
-	result := map[string]interface{}{
-		"timerId": newId,
-	}
-	responseJson, err := json.Marshal(result)
-	if err != nil {
-		panic(err.Error())
-	}
-
-	w.Write(responseJson)
 }
 
 func handlerThoseFuckingErrors(isTimerStartOk bool, isTimerEndOk bool, isUserIDOk bool) {
