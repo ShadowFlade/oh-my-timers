@@ -92,7 +92,9 @@ func (this *TimerHandler) CreateTimer(w http.ResponseWriter, r *http.Request) {
 		"userID": userID,
 		"id":     newTimerID,
 	})
-	fmt.Print(err.Error(),userID,newTimerID)
+	if err != nil {
+		fmt.Print(err.Error(),userID,newTimerID)
+	}
 }
 
 func (this *TimerHandler) UpdateTimer(w http.ResponseWriter, r *http.Request) {

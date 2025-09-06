@@ -67,6 +67,7 @@ func (this *Db) CreateTimer(timer interfaces.Timer) (int64, error) {
 	}
 
 	rowsAffected, err := result.RowsAffected()
+
 	if err != nil {
 		return 0, fmt.Errorf("failed to get rows affected: %w", err)
 	}
@@ -76,6 +77,7 @@ func (this *Db) CreateTimer(timer interfaces.Timer) (int64, error) {
 	}
 
 	newId, err := result.LastInsertId()
+
 	if err != nil {
 		return 0, fmt.Errorf("failed to get last insert ID: %w", err)
 	}
