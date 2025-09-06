@@ -1,3 +1,48 @@
 {{ block "timer" .}}
-hello
+<div class="timer js-timer" data-id="{{Id}}">
+        <form id="timerForm" method="PATCH" class="form">
+            <button type="button" id="deleteBtn" class="delete-btn" title="Delete Timer">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+            <div class="input-group">
+                <input
+                    type="text"
+                    id="title"
+                    name="title"
+                    placeholder="Title"
+                    class="input"
+                    required
+                >
+            </div>
+
+            <div class="timer-section">
+                <div class="timer-circle">
+                    <div class="timer-display" id="timerDisplay">
+                        00:00
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button
+                        type="button"
+                        id="startBtn"
+                        class="btn btn-primary"
+                    >
+                        Start
+                    </button>
+
+                    <button
+                        type="button"
+                        id="stopBtn"
+                        class="btn btn-secondary"
+                        disabled
+                    >
+                        Pause
+                    </button>
+                </div>
+            </div>
+        </form>
+</div>
 {{ end }}

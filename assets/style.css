@@ -1,0 +1,192 @@
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+
+body {
+	background-color: white;
+	min-height: 100vh;
+}
+
+.page {
+	
+}
+
+.container {
+	background-color: white;
+	border: 1px solid #d1d5db;
+	border-radius: 0.5rem;
+	padding: 2rem;
+	width: 100%;
+	max-width: 28rem;
+}
+
+.title {
+	font-size: 1.5rem;
+	font-weight: bold;
+	color: #111827;
+	margin-bottom: 2rem;
+	text-align: center;
+}
+
+.form {
+	display: flex;
+	flex-direction: column;
+	gap: 2rem;
+	position: relative;
+}
+
+.input-group {
+	display: flex;
+	flex-direction: column;
+}
+
+.label {
+	display: block;
+	font-size: 0.875rem;
+	font-weight: 500;
+	color: #111827;
+	margin-bottom: 0.5rem;
+}
+
+.input {
+	width: 100%;
+	padding: 0.5rem 0.75rem;
+	border: 1px solid transparent;
+	border-radius: 0.375rem;
+	font-size: 1rem;
+	transition: all 0.2s;
+}
+
+.input:focus {
+	outline: none;
+	border-color: #d1d5db;
+}
+
+.timers {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 2rem;
+	flex-wrap: wrap;
+}
+
+.timer-section {
+	text-align: center;
+}
+
+.timer-circle {
+	width: 8rem;
+	aspect-ratio: 1;
+	margin: 0 auto 2rem auto;
+	border: 2px solid #111827;
+	border-radius: 50%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.timer-display {
+	font-size: 2.25rem;
+	font-family: 'Courier New', monospace;
+	font-weight: bold;
+	color: #111827;
+}
+
+.button-group {
+	display: flex;
+	gap: 1rem;
+	justify-content: center;
+}
+
+.btn {
+	padding: 0.3em 1em;
+	border-radius: 0.375em;
+	font-size: 1em;
+	cursor: pointer;
+	transition: all 0.2s;
+	border: none;
+}
+
+.btn:focus {
+	outline: none;
+	ring: 2px solid #111827;
+	ring-offset: 2px;
+}
+
+.btn:disabled {
+	opacity: 0.5;
+	cursor: not-allowed;
+}
+
+.btn-primary {
+	background-color: #111827;
+	color: white;
+}
+
+.btn-primary:hover:not(:disabled) {
+	background-color: #374151;
+}
+
+.btn-secondary {
+	border: 1px solid #111827;
+	color: #111827;
+	background-color: white;
+}
+
+.btn-secondary:hover:not(:disabled) {
+	background-color: #f9fafb;
+}
+
+.btn-full {
+	width: 100%;
+}
+
+.delete-btn {
+	position: absolute;
+	top: 1rem;
+	right: 1rem;
+	width: 2rem;
+	height: 2rem;
+	border: none;
+	background: none;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: 0.25rem;
+	transition: background-color 0.2s;
+}
+
+.delete-btn:hover {
+	background-color: #f3f4f6;
+}
+
+.delete-btn svg {
+	width: 1rem;
+	height: 1rem;
+	color: #6b7280;
+}
+
+.add-timer-section {
+	padding-top: 3rem;
+	padding-bottom: 3rem;
+	text-align: center;
+}
+
+.add-timer-btn {
+	padding: 0.75rem 2rem;
+	background-color: #111827;
+	color: white;
+	border: none;
+	border-radius: 0.5rem;
+	font-size: 1.125rem;
+	font-weight: 600;
+	cursor: pointer;
+	transition: background-color 0.2s;
+}
+
+.add-timer-btn:hover {
+	background-color: #374151;
+}

@@ -3,13 +3,16 @@
 
 <head>
 	<link rel="stylesheet" href="/assets/style.css">
-	<script src="/assets/script.js"></script>
+	<script src="/assets/js/script.js"></script>
+	<script src="/assets/js/timer.js"></script>
+
 </head>
 
 <body>
-	<div>Hello</div>
-	{{ template "timers" . }}
-	{{ end }}
+	<div class="page">
+		{{ template "timers" . }}
+		{{ end }}
+	</div>
 </body>
 
 </html>

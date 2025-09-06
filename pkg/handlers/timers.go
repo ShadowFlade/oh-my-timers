@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"shadowflade/timers/pkg/global"
 	DB "shadowflade/timers/pkg/db"
+	"shadowflade/timers/pkg/global"
 	"shadowflade/timers/pkg/interfaces"
 	"shadowflade/timers/pkg/views"
 	"strconv"
@@ -75,11 +75,11 @@ func (this *TimerHandler) CreateTimer(w http.ResponseWriter, r *http.Request) {
 	}
 
 	newTimer := interfaces.Timer{
-		UserID: int32(userID),
-		Start: time.Now().Format(global.MYSQL_DATETIME_FORMAT),
-		End: time.Now().Format(global.MYSQL_DATETIME_FORMAT),
-		Title: "your mom",
-		Color: "red",
+		UserID:    int32(userID),
+		StartTime: time.Now().Format(global.MYSQL_DATETIME_FORMAT),
+		EndTime:   time.Now().Format(global.MYSQL_DATETIME_FORMAT),
+		Title:     "your mom",
+		Color:     "red",
 	}
 
 	newTimerID, err := db.CreateTimer(newTimer)
@@ -93,8 +93,16 @@ func (this *TimerHandler) CreateTimer(w http.ResponseWriter, r *http.Request) {
 		"id":     newTimerID,
 	})
 	if err != nil {
-		fmt.Print(err.Error(),userID,newTimerID)
+		fmt.Print(err.Error(), userID, newTimerID)
 	}
+}
+
+func (this *TimerHandler) PauseTimer(w http.ResponseWriter, r *http.Request) {
+	db := DB.Db{}
+	var body []byte
+	r.Body.Read(body)
+	var response map[string]interface{}
+	json.Unmarshal(body, &response)
 }
 
 func (this *TimerHandler) UpdateTimer(w http.ResponseWriter, r *http.Request) {
@@ -111,9 +119,9 @@ func (this *TimerHandler) UpdateTimer(w http.ResponseWriter, r *http.Request) {
 	handlerThoseFuckingErrors(isTimerStartOk, isTimerEndOk, isUserIDOk)
 
 	timer := interfaces.Timer{
-		Start:  timerStart,
-		End:    timerEnd,
-		UserID: int32(userID),
+		StartTime: timerStart,
+		EndTime:   timerEnd,
+		UserID:    int32(userID),
 	}
 
 	newId, err := db.CreateTimer(timer)

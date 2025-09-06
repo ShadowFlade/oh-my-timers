@@ -13,6 +13,9 @@ func main() {
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/createTimer", timerHandler.CreateTimer)
+	mux.HandleFunc("/pauseTimer", timerHandler.PauseTimer)
+	mux.HandleFunc("/deleteTimer", timerHandler.DeleteTimer)
+	mux.HandleFunc("/updateTimerTittle", timerHandler.UpdateTimerTitle)
 	mux.HandleFunc("/", timerHandler.RenderUserTimers)
 	mux.Handle("/assets/", http.StripPrefix("/assets", fileServer))
 
