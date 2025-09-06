@@ -61,7 +61,7 @@ func (this *Db) CreateTimer(timer interfaces.Timer) (int64, error) {
 		}
 	}()
 
-	query := fmt.Sprintf("INSERT INTO timers (start, end, user_id, title, color) VALUES ('%s', '%s', %d, '%s', '%s');", timer.Start, timer.End, timer.UserID, timer.Title, timer.Color)
+	query := fmt.Sprintf("INSERT INTO timers (start, end, user_id, title, color) VALUES ('%s', '%s', %d, '%s', '%s');", timer.StartTime, timer.EndTime, timer.UserID, timer.Title, timer.Color)
 	result, err := tx.Exec(query)
 
 	if err != nil {
@@ -93,7 +93,11 @@ func (this *Db) CreateTimer(timer interfaces.Timer) (int64, error) {
 	return newId, nil
 }
 
-func (this *Db) SetDuration(timerId int) (int64, error) {
+// Ставит таймер на паузу (обновляет paused_at, running_since)
+// Returns
+//
+//	newDuration - int64
+func (this *Db) PauseTimer(timerId int) (int64, error) {
 	db := Db{}
 	err := db.Connect()
 	if err != nil {
@@ -111,11 +115,13 @@ func (this *Db) SetDuration(timerId int) (int64, error) {
 		userTimer.RunningSince,
 	)
 
-	newDuration := runningSince.Add(time.Since(time.Now())).Unix() + userTimer.Duration
+	sinceNow := time.Since(time.Now())
+	newPausedAt := time.Now().Format(global.MYSQL_DATETIME_FORMAT)
+	newDuration := runningSince.Add(sinceNow).Unix() + userTimer.Duration
 
-	updateTimerDurationQuery := fmt.Sprintf("update %s where id = %s set duration = %s", this.TimersTable, timerId, newDuration)
+	updateTimerDurationQuery := fmt.Sprintf("update %s where id = %s set duration = %s, paused_at = %", this.TimersTable, timerId, newDuration, newPausedAt)
 
-	tx, err := db.db.Beginx() // Use Beginx instead of MustBegin for better error handling
+	tx, err := db.db.Beginx()
 	if err != nil {
 		return 0, fmt.Errorf("failed to begin transaction: %w", err)
 	}
@@ -144,7 +150,7 @@ func (this *Db) SetDuration(timerId int) (int64, error) {
 
 	tx = nil
 
-	return rowsAffected, nil
+	return newDuration, nil
 
 }
 

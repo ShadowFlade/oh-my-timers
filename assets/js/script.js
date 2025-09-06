@@ -1,5 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
 	const newTimerButton = document.querySelector(".js-new-timer__button");
+	
 	newTimerButton.addEventListener("click", async (e) => {
 		e.preventDefault();
 		const response = await fetch("/createTimer");

@@ -103,6 +103,24 @@ func (this *TimerHandler) PauseTimer(w http.ResponseWriter, r *http.Request) {
 	r.Body.Read(body)
 	var response map[string]interface{}
 	json.Unmarshal(body, &response)
+	timerId := response["timer_id"]
+	timerId, _ = strconv.Atoi(timerId.(string))
+
+	if timerId == nil {
+		return
+	}
+
+	newDuration, _ := db.PauseTimer(timerId.(int))
+	w.Write([]byte(string(newDuration)))
+
+}
+
+func (this *TimerHandler) UpdateTimerTitle(w http.ResponseWriter, r *http.Request) {
+
+}
+
+func (this *TimerHandler) DeleteTimer(w http.ResponseWriter, r *http.Request) {
+
 }
 
 func (this *TimerHandler) UpdateTimer(w http.ResponseWriter, r *http.Request) {

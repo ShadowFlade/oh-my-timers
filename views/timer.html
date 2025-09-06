@@ -1,7 +1,13 @@
 {{ block "timer" .}}
-<div class="timer js-timer" data-id="{{Id}}">
-        <form id="timerForm" method="PATCH" class="form">
-            <button type="button" id="deleteBtn" class="delete-btn" title="Delete Timer">
+<div class="timer js-timer" data-id="{{.Id}}"
+    data-running-since="{{.RunningSince}}"
+    data-duration="{{.Duration}}"
+    data-user-id="{{.UserId}}"
+    data-color="{{.Color}}"
+    data-id="{{.Id}}"
+>
+        <form id="timerForm" method="PATCH" class="form js-form">
+            <button type="button" id="deleteBtn" class="delete-btn js-delete-btn" title="Delete Timer">
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                 </svg>
@@ -14,12 +20,13 @@
                     placeholder="Title"
                     class="input"
                     required
+                    value="{{if .Title}}{{.Title}}{{end}}"
                 >
             </div>
 
             <div class="timer-section">
                 <div class="timer-circle">
-                    <div class="timer-display" id="timerDisplay">
+                    <div class="timer-display js-timer-display" id="timerDisplay">
                         00:00
                     </div>
                 </div>
@@ -28,7 +35,7 @@
                     <button
                         type="button"
                         id="startBtn"
-                        class="btn btn-primary"
+                        class="btn btn-primary js-start-btn"
                     >
                         Start
                     </button>
@@ -36,7 +43,7 @@
                     <button
                         type="button"
                         id="stopBtn"
-                        class="btn btn-secondary"
+                        class="btn btn-secondary js-stop-btn"
                         disabled
                     >
                         Pause

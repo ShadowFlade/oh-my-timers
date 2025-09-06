@@ -1,20 +1,32 @@
 class Timer {
-	constructor(id, manager) {
-		this.id = id;
-		this.manager = manager;
-		this.seconds = 0;
+	/**
+	 * 
+	 * @param {number} id 
+	 * @param {HTMLElement} timerContainer 
+	 */
+	constructor(id, timerContainer) {
+		this.timerContainer = timerContainer
+
+	
+	}
+
+	/**
+	 * 
+	 * @param {HTMLElement} dataContainer 
+	 */
+	setupState(dataContainer){
+		this.id = +dataContainer.dataset["id"];
+		this.seconds = +dataContainer.dataset["duration"];;
 		this.interval = null;
-		this.isRunning = false;
+		this.isRunning = !!dataContainer.dataset["runningSince"];
 	}
 	
-	bindEvents() {
-		const container = document.querySelector(`js-timer-${this.id}`);
-		
-		this.timerDisplay = document.getElementById(`timerDisplay-${this.id}`);
-		this.startBtn = container.querySelector('.start-btn');
-		this.stopBtn = container.querySelector('.stop-btn');
-		this.form = container.querySelector('.form');
-		this.deleteBtn = container.querySelector('.delete-btn');
+	bindEvents() {		
+		this.timerDisplay = this.timerContainer.querySelector("js-timer-display");
+		this.startBtn = this.timerContainer.querySelector('.js-start-btn');
+		this.stopBtn = this.timerContainer.querySelector('.js-stop-btn');
+		this.form = this.timerContainer.querySelector('.js-form');
+		this.deleteBtn = this.timerContainer.querySelector('.js-delete-btn');
 		
 		this.startBtn.addEventListener('click', () => this.start());
 		this.stopBtn.addEventListener('click', () => this.stop());
