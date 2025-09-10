@@ -56,7 +56,7 @@ type User struct {
 	uuid string `db:"uuid"`
 }
 
-func createUser(name string) User {
+func NewUser(name string) User {
 	user := User{}
 	user.name = name
 	return user

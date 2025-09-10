@@ -135,7 +135,8 @@ func handlerThoseFuckingErrors(isTimerStartOk bool, isTimerEndOk bool, isUserIDO
 
 func (this *TimerHandler) createUser(name string, w http.ResponseWriter) int64 {
 	userDb := DB.User{}
-	newUserID := userDb.CreateUser(name)
+	user := interfaces.NewUser(name)
+	newUserID := userDb.CreateUser(user)
 	cookie := http.Cookie{Name: "userID", Value: strconv.Itoa(int(newUserID))}
 	http.SetCookie(w, &cookie)
 	return newUserID
