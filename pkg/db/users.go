@@ -1,18 +1,25 @@
 package db
 
-import "fmt"
+import (
+	"log"
+	"shadowflade/timers/pkg/interfaces"
+)
 
 type User struct {
 }
 
-func (this *User) CreateUser(name string) int64 {
+func (this *User) CreateUser(user interfaces.User) int64 {
 	db := Db{}
 	db.Connect()
 	tx := db.db.MustBegin()
-	query := fmt.Sprintf("insert into %s (name) values ('%s');", db.UsersTable, name)
+	query := `
+	insert into into users (name) values (:name)
+	`
 
-	res := db.db.MustExec(query)
-	fmt.Printf(query)
+	res, err := db.db.NamedExec(query, user)
+	if err != nil {
+		log.Fatalf("Error on creating user. Query: %s", query)
+	}
 	newId, err := res.LastInsertId()
 	if err != nil {
 		panic(err.Error())
