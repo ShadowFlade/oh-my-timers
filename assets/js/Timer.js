@@ -62,7 +62,8 @@ class Timer {
 		const timer_id = this.timerContainer.dataset.id;
 		
 		if (!userId || !timer_id) {
-			alert("Не удалось определить ID юpthf или таймера")
+			alert("Не удалось определить ID юзера или таймера")
+			return;
 		}
 		
 		fetch(window.pauseTimer, {

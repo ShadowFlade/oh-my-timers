@@ -61,8 +61,11 @@ func (this *Db) CreateTimer(timer interfaces.Timer) (int64, error) {
 		}
 	}()
 
-	query := fmt.Sprintf("INSERT INTO timers (start, end, user_id, title, color) VALUES ('%s', '%s', %d, '%s', '%s');", timer.StartTime, timer.EndTime, timer.UserID, timer.Title, timer.Color)
-	result, err := tx.Exec(query)
+	query := `
+	insert into timers (start, end, user_id, title, color, date_inserted, duration) values (:start, :end, :user_id, :title, :color, :date_inserted, :duration)
+	`
+
+	result, err := tx.NamedExec(query, timer)
 
 	if err != nil {
 		return 0, fmt.Errorf("failed to execute query: %w", err)

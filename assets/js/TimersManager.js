@@ -4,11 +4,12 @@ class TimerManager {
 	 * @param {HTMLElement} timersContainer
 	 */
 	constructor(timersContainer) {
+		this.checkForExistingUserAndRegister();
 		this.timers = [];
 		this.timersContainer = timersContainer;
 		console.log(this.timersContainer)
 
-		this.addTimerBtn = document.getElementById('addTimerBtn');
+		this.addTimerBtn = document.querySelector('.js-new-timer__button');
 		this.timersContainer = document.querySelector('.js-timers');
 
 		this.bindEvents();
@@ -27,12 +28,20 @@ class TimerManager {
 		});
 	}
 
-	async addTimer() {
+	/**
+	 * Мб потом вынести в другую сущность
+	 */
+	checkForExistingUserAndRegister() {
 		const cookie = new Cookie();
 		const userId = cookie.get('user_id');
-		if(!userId) {
-			alert('Не обнаружено id пользователя')
+		if (!userId) {
+			const superSecretPassword = prompt('Не обнаружено id пользователя. Введите супер секретный пароль от вашего пользователя');
+			return;
 		}
+	}
+
+	async addTimer() {
+
 		
 		let newTimerHtml = '';
 		const resp = await fetch(window.createTimer, {
