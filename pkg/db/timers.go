@@ -114,8 +114,8 @@ func (this *Db) PauseTimer(timerId int) (int64, error) {
 
 	if userTimer.RunningSince.Valid {
 		start = userTimer.RunningSince.Time
-	} else if userTimer.StartTime.Valid {
-		start = userTimer.StartTime.Time
+	} else if userTimer.StartTime.IsZero() {
+		start = userTimer.StartTime
 	}
 
 	// Calculate elapsed time

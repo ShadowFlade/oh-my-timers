@@ -15,9 +15,14 @@ func main() {
 	mux.HandleFunc("/createTimer", timerHandler.CreateTimer)
 	mux.HandleFunc("/pauseTimer", timerHandler.PauseTimer)
 	mux.HandleFunc("/deleteTimer", timerHandler.DeleteTimer)
+	mux.HandleFunc("/createUser", timerHandler.CreateUser)
 	mux.HandleFunc("/updateTimerTittle", timerHandler.UpdateTimerTitle)
 	mux.HandleFunc("/", timerHandler.RenderUserTimers)
 	mux.Handle("/assets/", http.StripPrefix("/assets", fileServer))
 
 	log.Fatal(http.ListenAndServe(":"+global.PORT, mux))
+}
+
+func init() {
+	log.SetFlags(log.LstdFlags | log.Lshortfile)
 }

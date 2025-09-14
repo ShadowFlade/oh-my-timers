@@ -10,7 +10,7 @@ import (
 type Timer struct {
 	DateInserted      sql.NullTime `db:"date_inserted"`
 	DateModified      sql.NullTime `db:"date_modified"`
-	StartTime         sql.NullTime `db:"start"`
+	StartTime         time.Time    `db:"start"`
 	EndTime           sql.NullTime `db:"end"`
 	Duration          int64        `db:"duration"`
 	PausedAt          sql.NullTime `db:"paused_at"`
@@ -37,8 +37,8 @@ func NewTimer(userId int32, title string, color string) Timer {
 
 	timer.Color = color
 
-	timer.StartTime.Time = time.Now()
-	timer.StartTime.Valid = true
+	timer.StartTime = time.Now()
+	// timer.StartTime.Valid = true
 
 	timer.DateInserted.Time = time.Now()
 	timer.DateInserted.Valid = true
@@ -51,13 +51,15 @@ func NewTimer(userId int32, title string, color string) Timer {
 }
 
 type User struct {
-	id   int64  `db:"id"`
-	name string `db:"name"`
-	uuid string `db:"uuid"`
+	id       int64  `db:"id"`
+	Name     string `db:"name"`
+	uuid     string `db:"uuid"`
+	Password string `db:"password"`
 }
 
-func NewUser(name string) User {
+func NewUser(name string, password string) User {
 	user := User{}
-	user.name = name
+	user.Name = name
+	user.Password = password
 	return user
 }

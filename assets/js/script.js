@@ -5,6 +5,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 window.createTimer = '/createTimer';
+window.createUser = '/createUser';
 window.pauseTimer = '/pauseTimer';
 window.deleteTimer = '/deleteTimer';
 window.updateTimerTitle = '/updateTimerTitle';

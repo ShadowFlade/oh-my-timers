@@ -8,17 +8,17 @@ import (
 type User struct {
 }
 
-func (this *User) CreateUser(user interfaces.User) int64 {
+func (this *User) CreateUser(user interfaces.User, hashedPassword string) int64 {
 	db := Db{}
 	db.Connect()
 	tx := db.db.MustBegin()
 	query := `
-	insert into into users (name) values (:name)
+	insert into users (name, password) values (:name, :password)
 	`
 
 	res, err := db.db.NamedExec(query, user)
 	if err != nil {
-		log.Fatalf("Error on creating user. Query: %s", query)
+		log.Fatalf("Error on creating user. Query: %s", query, err.Error())
 	}
 	newId, err := res.LastInsertId()
 	if err != nil {

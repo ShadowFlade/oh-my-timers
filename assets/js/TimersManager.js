@@ -33,25 +33,23 @@ class TimerManager {
 	 */
 	checkForExistingUserAndRegister() {
 		const cookie = new Cookie();
-		const userId = cookie.get('user_id');
+		const userId = cookie.get('user_id_detected');
+		console.log(userId, ' user id from cookie',document.cookie);
 		if (!userId) {
 			const superSecretPassword = prompt('Не обнаружено id пользователя. Введите супер секретный пароль от вашего пользователя');
+			const user = new User();
+			user.createUser(superSecretPassword);
 			return;
 		}
 	}
 
 	async addTimer() {
-
-		
 		let newTimerHtml = '';
 		const resp = await fetch(window.createTimer, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
 			},
-			body: JSON.stringify(
-				{ userId }
-			),
 		})
 		newTimerHtml = await resp.text()
 

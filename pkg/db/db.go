@@ -27,7 +27,7 @@ func (this *Db) Connect() error {
 	this.password = env.Get("DB_PASS", "fucked")
 	this.dbName = env.Get("DB_NAME", "urmom")
 	this.dbHost = env.Get("DB_HOST", "host")
-	connectStr := fmt.Sprintf("%s:%s@tcp(127.0.0.1:3306)/%s", this.login, this.password, this.dbName)
+	connectStr := fmt.Sprintf("%s:%s@tcp(127.0.0.1:3306)/%s?parseTime=true&loc=UTC", this.login, this.password, this.dbName)
 	db, err := sqlx.Connect("mysql", connectStr)
 	this.UsersTable = "users"
 	this.TimersTable = "timers"

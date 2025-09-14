@@ -8,6 +8,7 @@ import (
 	DB "shadowflade/timers/pkg/db"
 	"shadowflade/timers/pkg/global"
 	"shadowflade/timers/pkg/interfaces"
+	"shadowflade/timers/pkg/services"
 	"shadowflade/timers/pkg/views"
 	"strconv"
 )
@@ -26,28 +27,16 @@ func (this *TimerHandler) RenderUserTimers(w http.ResponseWriter, r *http.Reques
 
 	userIdCookie, err := r.Cookie(global.COOKIE_USER_ID_NAME)
 	if err != nil {
-		userIdVal = "0"
+		panic("cookie was not found")
 	} else {
 		userIdVal = userIdCookie.Value
+		fmt.Printf("%s cookie user id ", userIdVal)
 	}
 
 	userId, err = strconv.Atoi(userIdVal)
 
-	if userId == 0 {
-		userId = int(this.createUser("USER", w))
-		http.SetCookie(w, &http.Cookie{Name: global.COOKIE_USER_ID_NAME, Value: strconv.Itoa(userId)})
-		templates.ExecuteTemplate(
-			w,
-			"index",
-			interfaces.TimerTemplate{
-				Items:        make([]interfaces.Timer, 0),
-				IsMoreThan10: false,
-				UserID:       userId,
-			},
-		)
-	}
 	userTimers := timersDb.GetAllUsersTimers(userId)
-
+	w.Header().Set("Access-Control-Allow-Credentials", "true")
 	templates.ExecuteTemplate(w, "index", interfaces.TimerTemplate{
 		Items:        userTimers,
 		IsMoreThan10: false,
@@ -75,6 +64,8 @@ func (this *TimerHandler) CreateTimer(w http.ResponseWriter, r *http.Request) {
 	}
 
 	newTimer := interfaces.NewTimer(int32(userID), "your mom", "red")
+	userTimers := make([]interfaces.Timer, 1, 1)
+	userTimers = append(userTimers, newTimer)
 
 	newTimerID, err := db.CreateTimer(newTimer)
 
@@ -82,9 +73,10 @@ func (this *TimerHandler) CreateTimer(w http.ResponseWriter, r *http.Request) {
 		panic(err.Error())
 	}
 
-	err = templates.ExecuteTemplate(w, "timer", map[string]interface{}{
-		"userID": userID,
-		"id":     newTimerID,
+	templates.ExecuteTemplate(w, "index", interfaces.TimerTemplate{
+		Items:        userTimers,
+		IsMoreThan10: false,
+		UserID:       userID,
 	})
 	if err != nil {
 		fmt.Print(err.Error(), userID, newTimerID)
@@ -93,7 +85,6 @@ func (this *TimerHandler) CreateTimer(w http.ResponseWriter, r *http.Request) {
 
 func (this *TimerHandler) PauseTimer(w http.ResponseWriter, r *http.Request) {
 	db := DB.Db{}
-
 	body, _ := io.ReadAll(r.Body)
 	var response map[string]interface{}
 	json.Unmarshal(body, &response)
@@ -133,11 +124,54 @@ func handlerThoseFuckingErrors(isTimerStartOk bool, isTimerEndOk bool, isUserIDO
 	}
 }
 
-func (this *TimerHandler) createUser(name string, w http.ResponseWriter) int64 {
+func (this *TimerHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
+	body, _ := io.ReadAll(r.Body)
+	var response map[string]string
+	json.Unmarshal(body, &response)
+	password := response["password"]
+
+	if password == "" {
+		resp, _ := json.Marshal(map[string]interface{}{
+			"error":     "Password is empty. Could not create user",
+			"isSuccess": false,
+		})
+		w.Write(resp)
+	}
+
+	userService := services.User{}
+	hashedPassword, _ := userService.HashPassword(password)
+
 	userDb := DB.User{}
-	user := interfaces.NewUser(name)
-	newUserID := userDb.CreateUser(user)
-	cookie := http.Cookie{Name: "userID", Value: strconv.Itoa(int(newUserID))}
-	http.SetCookie(w, &cookie)
-	return newUserID
+	user := interfaces.NewUser("USER", password)
+	newUserID := userDb.CreateUser(user, hashedPassword)
+	cookie := &http.Cookie{
+		Name:     "user_id",
+		Value:    strconv.Itoa(int(newUserID)),
+		Path:     "/",
+		MaxAge:   3600 * 24 * 7,
+		HttpOnly: true,
+		Secure:   true,
+		SameSite: http.SameSiteLaxMode,
+	}
+	http.SetCookie(w, cookie)
+
+	detectCookie := &http.Cookie{
+		Name:     "user_id_detected",
+		Value:    "1", // Simple flag
+		Path:     "/",
+		MaxAge:   3600 * 24 * 7,
+		HttpOnly: false,
+		Secure:   true,
+		SameSite: http.SameSiteStrictMode,
+	}
+	http.SetCookie(w, detectCookie)
+
+	w.Header().Set("Access-Control-Allow-Origin", "http://localhost:8080")
+	w.Header().Set("Access-Control-Allow-Credentials", "true")
+	w.Header().Set("Content-Type", "application/json")
+	newUserResp, _ := json.Marshal(map[string]interface{}{
+		"newUserId": newUserID,
+		"isSuccess": true,
+	})
+	w.Write(newUserResp)
 }
