@@ -4,6 +4,7 @@ class Timer {
 	 * @param {HTMLElement} timerContainer
 	 */
 	constructor(timerContainer) {
+		console.log(timerContainer, ' timer container');
 		this.timerContainer = timerContainer;
 		this.setupState(this.timerContainer);
 		this.bindEvents();
@@ -42,40 +43,46 @@ class Timer {
 		this.deleteBtn.addEventListener('click', () => this.delete());
 	}
 
-	start() {
+	async start() {
 		console.log('start');
 		if (!this.isRunning) {
 			this.isRunning = true;
 		}
+		const resp = await fetch(window.startTimer, {
+			body: JSON.stringify({ id: this.timerContainer.dataset.id }),
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+		});
+		const data = await resp.json();
+		console.log(data,' DARTA');
 		this.startUpdatingDisplay();
 	}
 
 	pause() {
 		if (!this.isRunning) return;
-		
+
 		this.isRunning = false;
 		this.startBtn.disabled = false;
 		this.pauseBtn.disabled = true;
 		clearInterval(this.interval);
 
-		const userId = this.timerContainer.dataset.userId
+		const userId = this.timerContainer.dataset.userId;
 		const timer_id = this.timerContainer.dataset.id;
-		
+
 		if (!userId || !timer_id) {
-			alert("Не удалось определить ID юзера или таймера")
+			alert('Не удалось определить ID юзера или таймера');
 			return;
 		}
-		
+
 		fetch(window.pauseTimer, {
-			method:"POST",
+			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
 			},
-			body: JSON.stringify(
-				{ userId, timer_id}
-			),
-			
-		})
+			body: JSON.stringify({ userId, timer_id }),
+		});
 	}
 
 	startUpdatingDisplay() {
@@ -89,12 +96,13 @@ class Timer {
 	}
 
 	updateDisplay() {
-		const minutes = Math.floor(this.seconds / 60);
-		const remainingSeconds = this.seconds % 60;
-
-		const formattedTime = `${minutes.toString().padStart(2, '0')}:${remainingSeconds
+		const hours = Math.floor(this.seconds / 3600);
+		const remainingSeconds = this.seconds % 3600;
+		const minutes = Math.floor(remainingSeconds / 60);
+		const seconds = remainingSeconds % 60;
+		const formattedTime = `${hours.toString().padStart(2, '0')}:${minutes
 			.toString()
-			.padStart(2, '0')}`;
+			.padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 		this.timerDisplay.textContent = formattedTime;
 	}
 

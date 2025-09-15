@@ -54,6 +54,7 @@ class TimerManager {
 		newTimerHtml = await resp.text()
 
 		const htmlElement = this.createTimerFromRawHtml(newTimerHtml);
+		console.log(htmlElement,' html element',htmlElement.firstChild,htmlElement.firstElementChild);
 		this.timersContainer.appendChild(htmlElement);
 		const timer = new Timer(htmlElement);
 		this.timers.push(timer);

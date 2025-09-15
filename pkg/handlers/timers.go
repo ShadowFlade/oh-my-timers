@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	DB "shadowflade/timers/pkg/db"
 	"shadowflade/timers/pkg/global"
@@ -30,7 +31,7 @@ func (this *TimerHandler) RenderUserTimers(w http.ResponseWriter, r *http.Reques
 		panic("cookie was not found")
 	} else {
 		userIdVal = userIdCookie.Value
-		fmt.Printf("%s cookie user id ", userIdVal)
+		// fmt.Printf("%s cookie user id ", userIdVal)
 	}
 
 	userId, err = strconv.Atoi(userIdVal)
@@ -73,14 +74,28 @@ func (this *TimerHandler) CreateTimer(w http.ResponseWriter, r *http.Request) {
 		panic(err.Error())
 	}
 
-	templates.ExecuteTemplate(w, "index", interfaces.TimerTemplate{
-		Items:        userTimers,
-		IsMoreThan10: false,
-		UserID:       userID,
-	})
+	templates.ExecuteTemplate(w, "timer", newTimer)
 	if err != nil {
 		fmt.Print(err.Error(), userID, newTimerID)
 	}
+}
+
+func (this *TimerHandler) StartTimer(w http.ResponseWriter, r *http.Request) {
+	db := DB.Db{}
+	body, _ := io.ReadAll(r.Body)
+	var response map[string]interface{}
+	json.Unmarshal(body, &response)
+	timerId := response["timer_id"]
+	if timerId == 0 || timerId == nil {
+		return
+	}
+	timerId, _ = strconv.Atoi(timerId.(string))
+
+	affectedRows, err := db.StartTimer(timerId.(int))
+	if err != nil {
+		log.Panic(err.Error())
+	}
+	w.Write([]byte(string(affectedRows)))
 }
 
 func (this *TimerHandler) PauseTimer(w http.ResponseWriter, r *http.Request) {
@@ -89,7 +104,6 @@ func (this *TimerHandler) PauseTimer(w http.ResponseWriter, r *http.Request) {
 	var response map[string]interface{}
 	json.Unmarshal(body, &response)
 	timerId := response["timer_id"]
-	fmt.Println(timerId, " TImer id")
 	if timerId == 0 || timerId == nil {
 		return
 	}

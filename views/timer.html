@@ -1,6 +1,7 @@
 {{ block "timer" .}}
 <div class="timer js-timer" data-id="{{.Id}}"
     data-running-since="{{.RunningSince.Value}}"
+    data-formatted-duration="{{.FormattedDuration}}"
     data-duration="{{.Duration}}"
     data-user-id="{{.UserID}}"
     data-color="{{.Color}}"

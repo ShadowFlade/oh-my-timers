@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"shadowflade/timers/pkg/interfaces"
+	"shadowflade/timers/pkg/services"
 	"strconv"
 	"time"
 
@@ -36,6 +37,7 @@ func (this *Timer) GetAllUsersTimers(userID int) []interfaces.Timer {
 		if err != nil {
 			log.Fatal(err.Error())
 		}
+		userTimer.FormattedDuration = services.FormatTimerDuration(userTimer.Duration)
 		userTimers = append(userTimers, userTimer)
 	}
 	tx.Commit()
@@ -96,6 +98,32 @@ func (this *Db) CreateTimer(timer interfaces.Timer) (int64, error) {
 	return newId, nil
 }
 
+func (this *Db) StartTimer(timerId int) (int64, error) {
+	db := Db{}
+	err := db.Connect()
+	if err != nil {
+		return 0, fmt.Errorf("failed to connect to database: %w", err)
+	}
+
+	query := `update timers set running_since = NOW(), date_modified = NOW() where id = ?;`
+	tx, err := db.db.Beginx()
+	if err != nil {
+		return 0, fmt.Errorf("failed to begin transaction: %w", err)
+	}
+	defer func() {
+		if tx != nil {
+			tx.Rollback()
+		}
+	}()
+	result, err := tx.Exec(query, timerId)
+	if err != nil {
+		log.Panic(err.Error())
+	}
+	affectedRows, _ := result.RowsAffected()
+	return affectedRows, nil
+
+}
+
 // Ставит таймер на паузу (обновляет paused_at, running_since)
 // Returns
 //
@@ -108,14 +136,17 @@ func (this *Db) PauseTimer(timerId int) (int64, error) {
 	}
 
 	userTimer := this.GetTimerById(timerId)
-	fmt.Println(userTimer, " user timer")
 
 	var start time.Time
 
 	if userTimer.RunningSince.Valid {
+		fmt.Println("Running since is valid")
 		start = userTimer.RunningSince.Time
-	} else if userTimer.StartTime.IsZero() {
+	} else if !userTimer.StartTime.IsZero() {
 		start = userTimer.StartTime
+		fmt.Println("Start time is zero")
+	} else {
+		log.Panicln("You fucked up with time bro")
 	}
 
 	// Calculate elapsed time
@@ -147,7 +178,9 @@ func (this *Db) PauseTimer(timerId int) (int64, error) {
 		timerId,
 	)
 	if err != nil {
-		log.Panicf("Query: %s failed to update timer: %w", updateTimerDurationQuery, err)
+		// log.Panic("Im failed")
+		log.Panicf("Query: %s \n failed to update timer: %w.\nDuration: %s,\nuserTimer.Duration: %s,\n elapsedSeconds: %s.\n Timer id : %s", updateTimerDurationQuery, err, newDuration, userTimer.Duration, elapsedSeconds, userTimer.Id)
+		// log.Panicf(err.Error())
 	}
 
 	// Commit transaction

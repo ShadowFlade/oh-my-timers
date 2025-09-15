@@ -14,6 +14,7 @@ func main() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/createTimer", timerHandler.CreateTimer)
 	mux.HandleFunc("/pauseTimer", timerHandler.PauseTimer)
+	mux.HandleFunc("/startTimer", timerHandler.StartTimer)
 	mux.HandleFunc("/deleteTimer", timerHandler.DeleteTimer)
 	mux.HandleFunc("/createUser", timerHandler.CreateUser)
 	mux.HandleFunc("/updateTimerTittle", timerHandler.UpdateTimerTitle)

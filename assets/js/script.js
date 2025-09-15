@@ -8,5 +8,7 @@ window.createTimer = '/createTimer';
 window.createUser = '/createUser';
 window.pauseTimer = '/pauseTimer';
 window.deleteTimer = '/deleteTimer';
+window.startTimer = '/startTimer';
+
 window.updateTimerTitle = '/updateTimerTitle';
 window.home = '/';

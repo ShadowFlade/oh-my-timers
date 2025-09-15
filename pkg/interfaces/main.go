@@ -2,7 +2,6 @@ package interfaces
 
 import (
 	"database/sql"
-	"fmt"
 	"shadowflade/timers/pkg/services"
 	"time"
 )
@@ -43,7 +42,7 @@ func NewTimer(userId int32, title string, color string) Timer {
 	timer.DateInserted.Time = time.Now()
 	timer.DateInserted.Valid = true
 
-	fmt.Printf("%#v", timer)
+	// fmt.Printf("%#v", timer)
 
 	formattedDuration := services.FormatTimerDuration(timer.Duration)
 	timer.FormattedDuration = formattedDuration
