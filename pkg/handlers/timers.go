@@ -86,16 +86,24 @@ func (this *TimerHandler) StartTimer(w http.ResponseWriter, r *http.Request) {
 	var response map[string]interface{}
 	json.Unmarshal(body, &response)
 	timerId := response["timer_id"]
+
 	if timerId == 0 || timerId == nil {
 		return
 	}
+
 	timerId, _ = strconv.Atoi(timerId.(string))
 
 	affectedRows, err := db.StartTimer(timerId.(int))
 	if err != nil {
 		log.Panic(err.Error())
 	}
-	w.Write([]byte(string(affectedRows)))
+	resp, _ := json.Marshal(map[string]interface{}{
+		"isSuccess": true,
+		"data": map[string]interface{}{
+			"affectedRows": affectedRows,
+		},
+	})
+	w.Write(resp)
 }
 
 func (this *TimerHandler) PauseTimer(w http.ResponseWriter, r *http.Request) {

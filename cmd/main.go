@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"shadowflade/timers/pkg/global"
 	"shadowflade/timers/pkg/handlers"
+	"time"
 )
 
 func main() {
@@ -26,4 +27,5 @@ func main() {
 
 func init() {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
+	time.Local = time.UTC
 }

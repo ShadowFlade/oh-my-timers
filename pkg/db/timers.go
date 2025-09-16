@@ -101,11 +101,11 @@ func (this *Db) CreateTimer(timer interfaces.Timer) (int64, error) {
 func (this *Db) StartTimer(timerId int) (int64, error) {
 	db := Db{}
 	err := db.Connect()
+	now := time.Now()
 	if err != nil {
 		return 0, fmt.Errorf("failed to connect to database: %w", err)
 	}
-
-	query := `update timers set running_since = NOW(), date_modified = NOW() where id = ?;`
+	query := `update timers set running_since = ?, date_modified = ? where id = ?;`
 	tx, err := db.db.Beginx()
 	if err != nil {
 		return 0, fmt.Errorf("failed to begin transaction: %w", err)
@@ -113,13 +113,19 @@ func (this *Db) StartTimer(timerId int) (int64, error) {
 	defer func() {
 		if tx != nil {
 			tx.Rollback()
+			fmt.Println("Ya dolboeb")
 		}
 	}()
-	result, err := tx.Exec(query, timerId)
+	result, err := tx.Exec(query, now, now, timerId)
 	if err != nil {
 		log.Panic(err.Error())
 	}
 	affectedRows, _ := result.RowsAffected()
+	err = tx.Commit()
+	if err != nil {
+		return 0, fmt.Errorf("failed to commit transaction: %w", err)
+	}
+	tx = nil
 	return affectedRows, nil
 
 }
@@ -140,11 +146,11 @@ func (this *Db) PauseTimer(timerId int) (int64, error) {
 	var start time.Time
 
 	if userTimer.RunningSince.Valid {
-		fmt.Println("Running since is valid")
 		start = userTimer.RunningSince.Time
+		fmt.Println("Using running since")
 	} else if !userTimer.StartTime.IsZero() {
 		start = userTimer.StartTime
-		fmt.Println("Start time is zero")
+		fmt.Println("Start time is not zero")
 	} else {
 		log.Panicln("You fucked up with time bro")
 	}
@@ -152,12 +158,14 @@ func (this *Db) PauseTimer(timerId int) (int64, error) {
 	// Calculate elapsed time
 	elapsedSeconds := int(time.Since(start).Seconds())
 	newDuration := userTimer.Duration + int64(elapsedSeconds)
+	fmt.Printf("elapsed: #%s, \nnewDuratino: %s, \nrunning since: %s, \nnow: %s", elapsedSeconds, newDuration, userTimer.RunningSince.Time, time.Now())
 
 	newPausedAt := time.Now()
 
+	now := time.Now()
 	updateTimerDurationQuery := `
 		UPDATE timers
-		SET duration = ?, paused_at = ?
+		SET duration = ?, paused_at = ?, running_since = null, date_modified = ?
 		WHERE id = ?`
 
 	tx, err := db.db.Beginx()
@@ -170,15 +178,15 @@ func (this *Db) PauseTimer(timerId int) (int64, error) {
 		}
 	}()
 
-	fmt.Println(newDuration, newPausedAt, timerId)
+	fmt.Println(newDuration, newPausedAt, now, now, timerId)
 	result, err := tx.Exec(
 		updateTimerDurationQuery,
 		newDuration,
-		newPausedAt,
+		now,
+		now,
 		timerId,
 	)
 	if err != nil {
-		// log.Panic("Im failed")
 		log.Panicf("Query: %s \n failed to update timer: %w.\nDuration: %s,\nuserTimer.Duration: %s,\n elapsedSeconds: %s.\n Timer id : %s", updateTimerDurationQuery, err, newDuration, userTimer.Duration, elapsedSeconds, userTimer.Id)
 		// log.Panicf(err.Error())
 	}
