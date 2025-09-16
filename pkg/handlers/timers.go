@@ -27,8 +27,13 @@ func (this *TimerHandler) RenderUserTimers(w http.ResponseWriter, r *http.Reques
 	var userIdVal string
 
 	userIdCookie, err := r.Cookie(global.COOKIE_USER_ID_NAME)
-	if err != nil {
-		panic("cookie was not found")
+	if err != nil || userIdCookie.Value == "0" {
+		templates.ExecuteTemplate(w, "index", interfaces.TimerTemplate{
+			Items:                   make([]interfaces.Timer, 0),
+			IsMoreThan10:            false,
+			UserID:                  0,
+			ShowNewUserAlertTrigger: false,
+		})
 	} else {
 		userIdVal = userIdCookie.Value
 		// fmt.Printf("%s cookie user id ", userIdVal)
@@ -39,9 +44,10 @@ func (this *TimerHandler) RenderUserTimers(w http.ResponseWriter, r *http.Reques
 	userTimers := timersDb.GetAllUsersTimers(userId)
 	w.Header().Set("Access-Control-Allow-Credentials", "true")
 	templates.ExecuteTemplate(w, "index", interfaces.TimerTemplate{
-		Items:        userTimers,
-		IsMoreThan10: false,
-		UserID:       userId,
+		Items:                   userTimers,
+		IsMoreThan10:            false,
+		UserID:                  userId,
+		ShowNewUserAlertTrigger: false,
 	})
 
 }
@@ -164,8 +170,8 @@ func (this *TimerHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
 	hashedPassword, _ := userService.HashPassword(password)
 
 	userDb := DB.User{}
-	user := interfaces.NewUser("USER", password)
-	newUserID := userDb.CreateUser(user, hashedPassword)
+	user := interfaces.NewUser("USER", hashedPassword)
+	newUserID := userDb.CreateUser(user)
 	cookie := &http.Cookie{
 		Name:     "user_id",
 		Value:    strconv.Itoa(int(newUserID)),

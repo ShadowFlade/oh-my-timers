@@ -22,9 +22,10 @@ type Timer struct {
 }
 
 type TimerTemplate struct {
-	Items        []Timer
-	IsMoreThan10 bool
-	UserID       int
+	Items                   []Timer
+	IsMoreThan10            bool
+	UserID                  int
+	ShowNewUserAlertTrigger bool
 }
 
 func NewTimer(userId int32, title string, color string) Timer {

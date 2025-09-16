@@ -31,16 +31,29 @@ class TimerManager {
 	/**
 	 * Мб потом вынести в другую сущность
 	 */
-	checkForExistingUserAndRegister() {
+	async checkForExistingUserAndRegister() {
 		const cookie = new Cookie();
 		const userId = cookie.get('user_id_detected');
 		console.log(userId, ' user id from cookie',document.cookie);
-		if (!userId) {
+		
+		if (!userId || this.checkForNewUserTrigger()) {
 			const superSecretPassword = prompt('Не обнаружено id пользователя. Введите супер секретный пароль от вашего пользователя');
 			const user = new User();
-			user.createUser(superSecretPassword);
-			return;
+			const resp = await user.createUser(superSecretPassword);
+			const data = await resp.json()
+			
+			return data.isSuccess;
 		}
+	}
+
+	/**
+	 * Проверяем есть ли скрытый инпут, который говорит о том, что нужно показать alert для ввода юзером пароля для создания нового юзера
+	 * @returns boolean Нужно ли показывать алерт для создания нового юзера
+	 */
+	checkForNewUserTrigger() {
+		const triggerHiddenInput = document.querySelector('.js-show-new-user-alert-trigger')
+		
+		return !!triggerHiddenInput;
 	}
 
 	async addTimer() {

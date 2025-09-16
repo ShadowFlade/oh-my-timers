@@ -8,7 +8,7 @@ import (
 type User struct {
 }
 
-func (this *User) CreateUser(user interfaces.User, hashedPassword string) int64 {
+func (this *User) CreateUser(user interfaces.User) int64 {
 	db := Db{}
 	db.Connect()
 	tx := db.db.MustBegin()

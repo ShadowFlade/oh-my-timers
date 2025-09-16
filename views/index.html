@@ -17,6 +17,9 @@
 <body>
 	<div class="page">
 		{{ template "timers" . }}
+		{{if .ShowNewUserAlertTrigger}}
+			<input type="hidden" name="show_new_user_alert_trigger" value="Y" class="js-show-new-user-alert-trigger">
+		{{end}}
 	</div>
 </body>
 
