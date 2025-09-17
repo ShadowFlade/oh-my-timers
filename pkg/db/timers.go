@@ -254,3 +254,32 @@ func (this *Db) UpdateTitle(title string, timerId int) (int64, error) {
 
 	return rowsAffected, nil
 }
+
+func (this *Db) DeleteTimer(timerId int64) (int, error) {
+	db := Db{}
+	err := db.Connect()
+	if err != nil {
+		log.Fatalf("Could not connect ot database updating title: %s", err.Error())
+	}
+	tx, err := db.db.Beginx()
+	if err != nil {
+		return 0, fmt.Errorf("failed to begin transaction: %w", err)
+	}
+	defer func() {
+		if tx != nil {
+			tx.Rollback()
+		}
+	}()
+
+	deleteTimerQuery := `delete from timers where id = ?`
+
+	result, err := tx.Exec(deleteTimerQuery, timerId)
+	if err != nil {
+		log.Fatalln("Could not delete timer with id: %d. Error: %s", timerId, err.Error())
+	}
+	rowsAffected, err := result.RowsAffected()
+	tx.Commit()
+	tx = nil
+
+	return int(rowsAffected), nil
+}

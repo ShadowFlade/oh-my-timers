@@ -161,6 +161,18 @@ func (this *TimerHandler) UpdateTimerTitle(w http.ResponseWriter, r *http.Reques
 }
 
 func (this *TimerHandler) DeleteTimer(w http.ResponseWriter, r *http.Request) {
+	db := db.Db{}
+	reqBody, _ := io.ReadAll(r.Body)
+	var body map[string]interface{}
+	json.Unmarshal(reqBody, &body)
+	timerId := body["timer_id"].(float64)
+	if timerId == 0 {
+		log.Panicln("Timer id is 0 from json body: %s", string(reqBody))
+	}
+	fmt.Println(timerId, "timer id to delete", string(reqBody))
+	rowsAffected, _ := db.DeleteTimer(int64(timerId))
+	jsonResponse := interfaces.JsonResponse{IsSuccess: rowsAffected > 0, Data: rowsAffected, Error: ""}
+	w.Write([]byte(jsonResponse.String()))
 
 }
 

@@ -41,7 +41,7 @@ class Timer {
 		this.startBtn.addEventListener('click', () => this.start());
 		this.pauseBtn.addEventListener('click', () => this.pause());
 		this.form.addEventListener('submit', (e) => this.handleSubmit(e));
-		this.deleteBtn.addEventListener('click', () => this.delete());
+		this.deleteBtn.addEventListener('click', (e) => this.delete(e));
 		this.titleInput.addEventListener('blur', (e) => this.handleTimerTitleChange(e))
 	}
 
