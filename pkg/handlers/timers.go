@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"shadowflade/timers/pkg/db"
 	DB "shadowflade/timers/pkg/db"
 	"shadowflade/timers/pkg/global"
 	"shadowflade/timers/pkg/interfaces"
@@ -129,6 +130,33 @@ func (this *TimerHandler) PauseTimer(w http.ResponseWriter, r *http.Request) {
 }
 
 func (this *TimerHandler) UpdateTimerTitle(w http.ResponseWriter, r *http.Request) {
+	db := db.Db{}
+	reqBody, _ := io.ReadAll(r.Body)
+	var body map[string]interface{}
+	json.Unmarshal(reqBody, body)
+	newTitle := body["newTitle"].(string)
+	if newTitle == "" {
+		return
+	}
+	cookie, err := r.Cookie(global.COOKIE_USER_ID_NAME)
+
+	if err != nil {
+		panic(err.Error())
+	}
+
+	cookieVal := cookie.Value
+	userID, err := strconv.Atoi(cookieVal)
+	affectedId, err := db.UpdateTitle(newTitle, userID)
+	if err != nil {
+		log.Panicf("Could not update timer title. Title: %s. Error: %s", newTitle, err.Error())
+	}
+	resp := interfaces.JsonResponse{
+		IsSuccess: true,
+		Data:      affectedId,
+		Error:     "",
+	}
+	w.Write([]byte(resp.String()))
+	return
 
 }
 

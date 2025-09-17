@@ -25,6 +25,7 @@ class Timer {
 		this.form = this.timerContainer.querySelector('.js-form');
 		this.deleteBtn = this.timerContainer.querySelector('.js-delete-btn');
 		console.log(this, ' this');
+		this.titleInput = this.timerContainer.querySelector('.js-timer-title')
 
 		this.id = +dataContainer.dataset['id'];
 		this.seconds = +dataContainer.dataset['duration'];
@@ -41,6 +42,19 @@ class Timer {
 		this.pauseBtn.addEventListener('click', () => this.pause());
 		this.form.addEventListener('submit', (e) => this.handleSubmit(e));
 		this.deleteBtn.addEventListener('click', () => this.delete());
+		this.titleInput.addEventListener('blur', (e) => this.handleTimerTitleChange(e))
+	}
+
+	async handleTimerTitleChange(e) {
+		const target = e.target;
+		const newTitle = target.value;
+		fetch(window.updateTimerTitle, {
+			body:JSON.stringify({newTitle}),
+			method:"POST",
+			headers: {
+				'Content-Type': 'application/json',
+			}
+		})
 	}
 
 	async start() {

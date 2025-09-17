@@ -228,4 +228,29 @@ func (this *Db) GetTimerById(timerId int) interfaces.Timer {
 	}
 
 	return userTimer
+
+}
+
+func (this *Db) UpdateTitle(title string, timerId int) (int64, error) {
+	db := Db{}
+	err := db.Connect()
+	if err != nil {
+		log.Fatalf("Could not connect ot database updating title: %s", err.Error())
+	}
+	tx, err := db.db.Beginx()
+	if err != nil {
+		return 0, fmt.Errorf("failed to begin transaction: %w", err)
+	}
+	defer func() {
+		if tx != nil {
+			tx.Rollback()
+		}
+	}()
+	updateTitleQuery := `update timers set title = ? where id = ?;`
+	result, err := tx.Exec(updateTitleQuery, title, timerId)
+	rowsAffected, _ := result.RowsAffected()
+
+	tx = nil
+
+	return rowsAffected, nil
 }

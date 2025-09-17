@@ -2,6 +2,8 @@ package interfaces
 
 import (
 	"database/sql"
+	"encoding/json"
+	"log"
 	"shadowflade/timers/pkg/services"
 	"time"
 )
@@ -62,4 +64,20 @@ func NewUser(name string, password string) User {
 	user.Name = name
 	user.Password = password
 	return user
+}
+
+type JsonResponse struct {
+	IsSuccess bool        `json:"IsSuccess"`
+	Data      interface{} `json:"Data"`
+	Error     string      `json:"Error"`
+}
+
+func (this *JsonResponse) String() string {
+	jsonBytes, err := json.Marshal(this)
+
+	if err != nil {
+		log.Fatalln("Could not marshal json response and im too lazy to write more elaborated error")
+	}
+
+	return string(jsonBytes)
 }
