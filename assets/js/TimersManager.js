@@ -7,7 +7,6 @@ class TimerManager {
 		this.checkForExistingUserAndRegister();
 		this.timers = [];
 		this.timersContainer = timersContainer;
-		console.log(this.timersContainer);
 
 		this.addTimerBtn = document.querySelector('.js-new-timer__button');
 		this.timersContainer = document.querySelector('.js-timers');
@@ -21,15 +20,12 @@ class TimerManager {
 	}
 
 	initTimers() {
-		console.log('init timers');
 		let tabIndex = 1;
 		Array.from(this.timersContainer.children).forEach((timerHtml) => {
 			const timer = new Timer(timerHtml);
 			timer.titleInput.tabIndex = tabIndex// i dont like this shit but doing this in go templates is tedious
-			console.log(timerHtml,' html', tabIndex,' tabindex');
 			this.timers.push(timer);
 			timer.manager = this;
-			console.log(timerHtml, ' timer html');
 			tabIndex++;
 		});
 
@@ -42,7 +38,6 @@ class TimerManager {
 	async checkForExistingUserAndRegister() {
 		const cookie = new Cookie();
 		const userId = cookie.get('user_id_detected');
-		console.log(userId, ' user id from cookie', document.cookie);
 
 		if (!userId || this.checkForNewUserTrigger()) {
 			const superSecretPassword = prompt(
@@ -77,12 +72,7 @@ class TimerManager {
 		newTimerHtml = await resp.text();
 
 		const htmlElement = this.createTimerFromRawHtml(newTimerHtml);
-		console.log(
-			htmlElement,
-			' html element',
-			htmlElement.firstChild,
-			htmlElement.firstElementChild
-		);
+
 		this.timersContainer.appendChild(htmlElement);
 		const timer = new Timer(htmlElement);
 		this.timers.push(timer);
@@ -104,10 +94,7 @@ class TimerManager {
 	 * @param {number} timerId
 	 */
 	async removeTimer(timerId) {
-		console.log(timerId, 'timer id');
 		const timerIndex = this.timers.findIndex((t) => t.id === timerId);
-		console.log(this.timers, 'TIMERS');
-		console.log(timerIndex, 'timerIndex');
 
 		if (timerIndex !== -1) {
 			const timerElement = this.timers[timerIndex].timerContainer;
@@ -127,7 +114,7 @@ class TimerManager {
 					},
 				});
 				const data = await resp.json();
-				console.log(data,' DATA')
+
 				if (data.IsSuccess) {
 					timerElement.remove();
 				} else {

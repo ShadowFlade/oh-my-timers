@@ -4,9 +4,9 @@ class Timer {
 	 * @param {HTMLElement} timerContainer
 	 */
 	constructor(timerContainer) {
-		console.log(timerContainer, ' timer container');
 		this.timerContainer = timerContainer;
 		this.setupState(this.timerContainer);
+		this.initTime()
 		this.bindEvents();
 
 		if (this.isRunning) {
@@ -24,7 +24,6 @@ class Timer {
 		this.pauseBtn = this.timerContainer.querySelector('.js-pause-btn');
 		this.form = this.timerContainer.querySelector('.js-form');
 		this.deleteBtn = this.timerContainer.querySelector('.js-delete-btn');
-		console.log(this, ' this');
 		this.titleInput = this.timerContainer.querySelector('.js-timer-title')
 
 		this.id = +dataContainer.dataset['id'];
@@ -32,9 +31,7 @@ class Timer {
 		this.interval = null;
 		const runningSince = dataContainer.dataset['runningSince'];
 		const pausedAt = dataContainer.dataset['paused_at'];
-		console.log(runningSince, pausedAt, 'hey');
 		this.isRunning = !!runningSince && !pausedAt;
-		console.log(this.isRunning, ' is running', this.id);
 	}
 
 	bindEvents() {
@@ -58,11 +55,9 @@ class Timer {
 	}
 
 	async start() {
-		console.log('start');
 		if (!this.isRunning) {
 			this.isRunning = true;
 		}
-		console.log('timer id', this.timerContainer.dataset.id)
 		const resp = await fetch(window.startTimer, {
 			body: JSON.stringify({ timer_id: this.timerContainer.dataset.id }),
 			method: 'POST',
@@ -71,8 +66,22 @@ class Timer {
 			},
 		});
 		const data = await resp.json();
-		console.log(data,' DARTA');
 		this.startUpdatingDisplay();
+	}
+
+	initTime() {
+		const runningSince = this.timerContainer.dataset.runningSince;
+		if (!runningSince) {
+			console.error(`Could not init time for timer ${this.id}`)
+			return; //TODO[quality]:make frontend logger (send to backend)
+		}
+		const runningSinceDate = new Date(runningSince);
+		const runningSinceTime = runningSinceDate.getTime()
+		const now = Date.now();
+		console.log({now,runningSinceDate,runningSinceTime})
+		const seconds = Math.round((now - runningSinceTime) / 1000);
+		this.seconds = seconds;
+		console.log(this.timerContainer.dataset.runningSince, 'running since', seconds, 'seconds');
 	}
 
 	pause() {
@@ -102,12 +111,10 @@ class Timer {
 	}
 
 	startUpdatingDisplay() {
-		console.log('start updating display');
 		this.startBtn.disabled = true;
 		this.pauseBtn.disabled = false;
 
 		this.interval = setInterval(() => {
-			console.log(this.seconds,' seconds')
 			this.seconds++;
 			this.updateDisplay();
 		}, 1000);
@@ -115,6 +122,8 @@ class Timer {
 
 	updateDisplay() {
 		const hours = Math.floor(this.seconds / 3600);
+		console.log(hours,' hours')
+
 		const remainingSeconds = this.seconds % 3600;
 		const minutes = Math.floor(remainingSeconds / 60);
 		const seconds = remainingSeconds % 60;

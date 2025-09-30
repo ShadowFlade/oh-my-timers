@@ -98,13 +98,13 @@ func (this *Db) CreateTimer(timer interfaces.Timer) (int64, error) {
 	return newId, nil
 }
 
-func (this *Db) StartTimer(timerId int) (int64, error) {
+func (this *Db) StartTimer(timerId int, startTime int64) (int64, error) {
 	db := Db{}
 	err := db.Connect()
-	now := time.Now()
 	if err != nil {
 		return 0, fmt.Errorf("failed to connect to database: %w", err)
 	}
+	sTime := time.Unix(startTime, 0)
 	query := `update timers set running_since = ?, date_modified = ? where id = ?;`
 	tx, err := db.db.Beginx()
 	if err != nil {
@@ -116,7 +116,7 @@ func (this *Db) StartTimer(timerId int) (int64, error) {
 			fmt.Println("Ya dolboeb")
 		}
 	}()
-	result, err := tx.Exec(query, now, now, timerId)
+	result, err := tx.Exec(query, sTime, sTime, timerId)
 	if err != nil {
 		log.Panic(err.Error())
 	}
@@ -133,7 +133,7 @@ func (this *Db) StartTimer(timerId int) (int64, error) {
 // Ставит таймер на паузу (обновляет paused_at, running_since)
 // Параметры:
 //
-//   - timerId: подключение к базе данных
+//   - timerId: id таймера
 //
 //   - pauseTime - время остановки таймера, которое приходит с фронта, в милисекундах
 //
