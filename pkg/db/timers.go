@@ -37,7 +37,8 @@ func (this *Timer) GetAllUsersTimers(userID int) []interfaces.Timer {
 		if err != nil {
 			log.Fatal(err.Error())
 		}
-		userTimer.FormattedDuration = services.FormatTimerDuration(userTimer.Duration)
+		userTimer.FormattedDuration = services.FormatTimerDuration(time.Now().Unix() - userTimer.RunningSince.Time.Unix())
+
 		userTimers = append(userTimers, userTimer)
 	}
 	tx.Commit()
