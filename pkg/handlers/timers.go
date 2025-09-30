@@ -80,6 +80,7 @@ func (this *TimerHandler) CreateTimer(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		panic(err.Error())
 	}
+	newTimer.Id = newTimerID
 
 	templates.ExecuteTemplate(w, "timer", newTimer)
 	if err != nil {

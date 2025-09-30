@@ -101,10 +101,12 @@ class Timer {
 	}
 
 	startUpdatingDisplay() {
+		console.log('start updating display');
 		this.startBtn.disabled = true;
 		this.pauseBtn.disabled = false;
 
 		this.interval = setInterval(() => {
+			console.log(this.seconds,' seconds')
 			this.seconds++;
 			this.updateDisplay();
 		}, 1000);

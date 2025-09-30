@@ -79,7 +79,6 @@ class TimerManager {
 		this.timersContainer.appendChild(htmlElement);
 		const timer = new Timer(htmlElement);
 		this.timers.push(timer);
-		timer.bindEvents();
 	}
 
 	/**
