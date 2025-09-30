@@ -94,6 +94,7 @@ func (this *TimerHandler) StartTimer(w http.ResponseWriter, r *http.Request) {
 	var response map[string]interface{}
 	json.Unmarshal(body, &response)
 	timerId := response["timer_id"]
+	startTime := response["start_time"]
 
 	if timerId == 0 || timerId == nil {
 		return
@@ -101,7 +102,7 @@ func (this *TimerHandler) StartTimer(w http.ResponseWriter, r *http.Request) {
 
 	timerId, _ = strconv.Atoi(timerId.(string))
 
-	affectedRows, err := db.StartTimer(timerId.(int))
+	affectedRows, err := db.StartTimer(timerId.(int), startTime.(int64))
 	if err != nil {
 		log.Panic(err.Error())
 	}
@@ -120,12 +121,14 @@ func (this *TimerHandler) PauseTimer(w http.ResponseWriter, r *http.Request) {
 	var response map[string]interface{}
 	json.Unmarshal(body, &response)
 	timerId := response["timer_id"]
+	pauseTime := response["pause_time"]
 	if timerId == 0 || timerId == nil {
+
 		return
 	}
 	timerId, _ = strconv.Atoi(timerId.(string))
 
-	newDuration, _ := db.PauseTimer(timerId.(int))
+	newDuration, _ := db.PauseTimer(timerId.(int), int64(pauseTime.(float64)))
 	w.Write([]byte(string(newDuration)))
 
 }

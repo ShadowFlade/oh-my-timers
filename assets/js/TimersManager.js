@@ -21,12 +21,19 @@ class TimerManager {
 	}
 
 	initTimers() {
+		console.log('init timers');
+		let tabIndex = 1;
 		Array.from(this.timersContainer.children).forEach((timerHtml) => {
 			const timer = new Timer(timerHtml);
+			timer.titleInput.tabIndex = tabIndex// i dont like this shit but doing this in go templates is tedious
+			console.log(timerHtml,' html', tabIndex,' tabindex');
 			this.timers.push(timer);
 			timer.manager = this;
 			console.log(timerHtml, ' timer html');
+			tabIndex++;
 		});
+
+		this.lastTabIndex = tabIndex
 	}
 
 	/**

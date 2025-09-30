@@ -131,10 +131,16 @@ func (this *Db) StartTimer(timerId int) (int64, error) {
 }
 
 // Ставит таймер на паузу (обновляет paused_at, running_since)
+// Параметры:
+//
+//   - timerId: подключение к базе данных
+//
+//   - pauseTime - время остановки таймера, которое приходит с фронта, в милисекундах
+//
 // Returns
 //
 //	newDuration - int64
-func (this *Db) PauseTimer(timerId int) (int64, error) {
+func (this *Db) PauseTimer(timerId int, pauseTime int64) (int64, error) {
 	db := Db{}
 	err := db.Connect()
 	if err != nil {
@@ -163,6 +169,7 @@ func (this *Db) PauseTimer(timerId int) (int64, error) {
 	newPausedAt := time.Now()
 
 	now := time.Now()
+	pausedAt := time.Unix(pauseTime/1000, 0) //TODO[check]:int64 делится на 1000 ?
 	updateTimerDurationQuery := `
 		UPDATE timers
 		SET duration = ?, paused_at = ?, running_since = null, date_modified = ?
@@ -182,7 +189,7 @@ func (this *Db) PauseTimer(timerId int) (int64, error) {
 	result, err := tx.Exec(
 		updateTimerDurationQuery,
 		newDuration,
-		now,
+		pausedAt,
 		now,
 		timerId,
 	)

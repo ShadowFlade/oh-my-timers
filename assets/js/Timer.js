@@ -91,12 +91,13 @@ class Timer {
 			return;
 		}
 
+		const pause_time = Date.now();
 		fetch(window.pauseTimer, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
 			},
-			body: JSON.stringify({ userId, timer_id }),
+			body: JSON.stringify({ userId, timer_id, pause_time }),
 		});
 	}
 
