@@ -37,7 +37,14 @@ func (this *Timer) GetAllUsersTimers(userID int) []interfaces.Timer {
 		if err != nil {
 			log.Fatal(err.Error())
 		}
-		userTimer.FormattedDuration = services.FormatTimerDuration(time.Now().Unix() - userTimer.RunningSince.Time.Unix())
+		var duration int64
+		duration = 0
+		if userTimer.RunningSince.Valid {
+			duration = time.Now().Unix() - userTimer.RunningSince.Time.Unix()
+		} else {
+			duration = userTimer.Duration
+		}
+		userTimer.FormattedDuration = services.FormatTimerDuration(duration)
 
 		userTimers = append(userTimers, userTimer)
 	}
@@ -196,10 +203,8 @@ func (this *Db) PauseTimer(timerId int, pauseTime int64) (int64, error) {
 	)
 	if err != nil {
 		log.Panicf("Query: %s \n failed to update timer: %w.\nDuration: %s,\nuserTimer.Duration: %s,\n elapsedSeconds: %s.\n Timer id : %s", updateTimerDurationQuery, err, newDuration, userTimer.Duration, elapsedSeconds, userTimer.Id)
-		// log.Panicf(err.Error())
 	}
 
-	// Commit transaction
 	if err := tx.Commit(); err != nil {
 		log.Panicf("failed to commit: %w", err)
 	}

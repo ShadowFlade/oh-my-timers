@@ -59,7 +59,10 @@ class Timer {
 			this.isRunning = true;
 		}
 		const resp = await fetch(window.startTimer, {
-			body: JSON.stringify({ timer_id: this.timerContainer.dataset.id }),
+			body: JSON.stringify({
+				timer_id: this.timerContainer.dataset.id,
+				start_time: Date.now() / 1000,
+			}),
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',

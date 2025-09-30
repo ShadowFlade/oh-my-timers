@@ -102,7 +102,7 @@ func (this *TimerHandler) StartTimer(w http.ResponseWriter, r *http.Request) {
 
 	timerId, _ = strconv.Atoi(timerId.(string))
 
-	affectedRows, err := db.StartTimer(timerId.(int), startTime.(int64))
+	affectedRows, err := db.StartTimer(timerId.(int), int64(startTime.(float64)))
 	if err != nil {
 		log.Panic(err.Error())
 	}
