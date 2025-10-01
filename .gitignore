@@ -5,3 +5,4 @@ main
 readme_private.md
 .idea
 *sql
+*.gz

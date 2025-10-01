@@ -24,10 +24,10 @@ jobs:
             cd /home/projects/oh-my-timers || exit 1
             echo "[$(date)] Начало деплоя" >> /var/log/deploy.log
             {
-              git pull origin main
+              git pull origin master
               find assets/js -type f -name "*.js" -exec gzip -f -k -9 {} \;
-              find assets/css -type f -name "*.css" -exec gzip -f -k -9 {} \;
-              sudo service my-go-app restart
+              find assets -type f -name "*.css" -exec gzip -f -k -9 {} \;
+              sudo service oh-my-timers restart
               echo "✅ Успешно"
-            } >> /var/log/deploy.log 2>&1
+            }  2>&1 | tee -a /var/log/deploy.log
             echo "[$(date)] Завершено" >> /var/log/deploy.log
