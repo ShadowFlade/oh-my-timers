@@ -29,7 +29,7 @@ jobs:
               git pull origin master
               find assets/js -type f -name "*.js" -exec gzip -f -k -9 {} \;
               find assets -type f -name "*.css" -exec gzip -f -k -9 {} \;
-              sudo service oh-my-timers restart
+              sudo systemctl restart oh-my-timers
               echo "✅ Успешно"
             }  2>&1 | tee -a /var/log/deploy.log
             echo "[$(date)] Завершено" >> /var/log/deploy.log
