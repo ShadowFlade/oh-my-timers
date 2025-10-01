@@ -20,13 +20,14 @@ jobs:
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            cd /home/projects/oh-my-timers
-            git pull origin master
-
-            find assets/js -type f -name "*.js" -exec gzip -f -k -9 {} \;
-            find assets/css -type f -name "*.css" -exec gzip -f -k -9 {} \;
-
-            go build cmd/main.go
-            sudo service oh-my-timers restart
-
-            echo "✅ Деплой завершён: $(date)"
+            git config --global --add safe.directory /home/projects/oh-my-timers
+            cd /home/projects/oh-my-timers || exit 1
+            echo "[$(date)] Начало деплоя" >> /var/log/deploy.log
+            {
+              git pull origin main
+              find assets/js -type f -name "*.js" -exec gzip -f -k -9 {} \;
+              find assets/css -type f -name "*.css" -exec gzip -f -k -9 {} \;
+              sudo service my-go-app restart
+              echo "✅ Успешно"
+            } >> /var/log/deploy.log 2>&1
+            echo "[$(date)] Завершено" >> /var/log/deploy.log
