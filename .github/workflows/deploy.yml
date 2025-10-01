@@ -21,6 +21,8 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             git config --global --add safe.directory /home/projects/oh-my-timers
+            # Включить режим "остановиться при первой ошибке"
+            set -e
             cd /home/projects/oh-my-timers || exit 1
             echo "[$(date)] Начало деплоя" >> /var/log/deploy.log
             {
