@@ -126,6 +126,7 @@ func (this *TimerHandler) PauseTimer(w http.ResponseWriter, r *http.Request) {
 
 		return
 	}
+	fmt.Println("TEST2")
 	fmt.Println("TEST")
 	timerId, _ = strconv.Atoi(timerId.(string))
 
