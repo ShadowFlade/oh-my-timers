@@ -1,0 +1,32 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  deploy:
+    name: Deploy via SSH
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to server via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.HOST }}
+          port: 22
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd /home/projects/oh-my-timers
+            git pull origin master
+
+            find assets/js -type f -name "*.js" -exec gzip -f -k -9 {} \;
+            find assets/css -type f -name "*.css" -exec gzip -f -k -9 {} \;
+
+            go build cmd/main.go
+            sudo service oh-my-timers restart
+
+            echo "✅ Деплой завершён: $(date)"
