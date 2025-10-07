@@ -31,7 +31,7 @@ func (this *Db) Connect() error {
 	db, err := sqlx.Connect("mysql", connectStr)
 	this.UsersTable = "users"
 	this.TimersTable = "timers"
-	db.Query("SET time_zone = '+03:00'")
+// 	db.Query("SET time_zone = '+03:00'")
 
 	if err != nil {
 		return err
