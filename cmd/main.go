@@ -16,7 +16,7 @@ func main() {
 	// fileServer := http.FileServer(http.Dir("./assets/"))
 
 	mux := http.NewServeMux()
-	mux.Handle("/assets/", assetsHandler)
+	mux.Handle("/assets/", http.HandlerFunc(assetsHandler))
 	mux.HandleFunc("/createTimer", timerHandler.CreateTimer)
 	mux.HandleFunc("/pauseTimer", timerHandler.PauseTimer)
 	mux.HandleFunc("/startTimer", timerHandler.StartTimer)
@@ -35,6 +35,18 @@ func init() {
 
 func assetsHandler(w http.ResponseWriter, r *http.Request) {
 	path := strings.TrimPrefix(r.URL.Path, "/assets/")
+
+	// Если путь пустой или заканчивается на / - отдаем 404
+	if path == "" || strings.HasSuffix(r.URL.Path, "/") {
+		http.NotFound(w, r)
+		return
+	}
+
+	// Проверяем безопасность пути
+	if strings.Contains(path, "..") {
+		http.Error(w, "Invalid path", http.StatusBadRequest)
+		return
+	}
 
 	// Устанавливаем Content-Type в зависимости от расширения
 	ext := strings.ToLower(filepath.Ext(path))

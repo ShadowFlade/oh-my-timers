@@ -6,13 +6,14 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"strconv"
+
 	"shadowflade/timers/pkg/db"
 	DB "shadowflade/timers/pkg/db"
 	"shadowflade/timers/pkg/global"
 	"shadowflade/timers/pkg/interfaces"
 	"shadowflade/timers/pkg/services"
 	"shadowflade/timers/pkg/views"
-	"strconv"
 )
 
 type TimerHandler struct {
@@ -35,6 +36,7 @@ func (this *TimerHandler) RenderUserTimers(w http.ResponseWriter, r *http.Reques
 			UserID:                  0,
 			ShowNewUserAlertTrigger: false,
 		})
+		return
 	} else {
 		userIdVal = userIdCookie.Value
 		// fmt.Printf("%s cookie user id ", userIdVal)
