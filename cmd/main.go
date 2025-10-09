@@ -1,11 +1,14 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"path/filepath"
 	"strings"
 	"time"
+
+	"github.com/gofor-little/env"
 
 	"shadowflade/timers/pkg/global"
 	"shadowflade/timers/pkg/handlers"
@@ -33,6 +36,11 @@ func init() {
 }
 
 func assetsHandler(w http.ResponseWriter, r *http.Request) {
+	if err := env.Load("./.env"); err != nil {
+		fmt.Println("error")
+		panic(err)
+	}
+
 	path := strings.TrimPrefix(r.URL.Path, "/assets/")
 
 	if path == "" || strings.HasSuffix(r.URL.Path, "/") {
@@ -66,8 +74,14 @@ func assetsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Кеширование
+	cacheControlHeader := ""
+	if env.Get("IS_PROD", "Y") == "Y" {
+		cacheControlHeader = "public, max-age=86400"
+	} else {
+		cacheControlHeader = "no-cache, no-store, must-revalidate"
+	}
 	if ext == ".css" || ext == ".js" {
-		w.Header().Set("Cache-Control", "public, max-age=31536000")
+		w.Header().Set("Cache-Control", cacheControlHeader)
 	}
 
 	http.ServeFile(w, r, "./assets/"+path)
