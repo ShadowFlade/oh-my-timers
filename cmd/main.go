@@ -13,7 +13,6 @@ import (
 
 func main() {
 	timerHandler := handlers.TimerHandler{}
-	// fileServer := http.FileServer(http.Dir("./assets/"))
 
 	mux := http.NewServeMux()
 	mux.Handle("/assets/", http.HandlerFunc(assetsHandler))
@@ -36,19 +35,16 @@ func init() {
 func assetsHandler(w http.ResponseWriter, r *http.Request) {
 	path := strings.TrimPrefix(r.URL.Path, "/assets/")
 
-	// Если путь пустой или заканчивается на / - отдаем 404
 	if path == "" || strings.HasSuffix(r.URL.Path, "/") {
 		http.NotFound(w, r)
 		return
 	}
 
-	// Проверяем безопасность пути
 	if strings.Contains(path, "..") {
 		http.Error(w, "Invalid path", http.StatusBadRequest)
 		return
 	}
 
-	// Устанавливаем Content-Type в зависимости от расширения
 	ext := strings.ToLower(filepath.Ext(path))
 	switch ext {
 	case ".css":
@@ -69,11 +65,10 @@ func assetsHandler(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "text/plain; charset=utf-8")
 	}
 
-	// Кэширование
+	// Кеширование
 	if ext == ".css" || ext == ".js" {
 		w.Header().Set("Cache-Control", "public, max-age=31536000")
 	}
 
-	// Отдаем файл
 	http.ServeFile(w, r, "./assets/"+path)
 }
