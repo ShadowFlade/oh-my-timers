@@ -143,6 +143,32 @@ func (this *TimerHandler) PauseTimer(w http.ResponseWriter, r *http.Request) {
 
 }
 
+func (this *TimerHandler) StopTimer(w http.ResponseWriter, r *http.Request) {
+	db := DB.Db{}
+	body, _ := io.ReadAll(r.Body)
+	var response map[string]interface{}
+	json.Unmarshal(body, &response)
+	timerId := response["timer_id"]
+	pauseTime := response["pause_time"]
+	if timerId == 0 || timerId == nil {
+
+		return
+	}
+
+	fmt.Println("TEST7")
+	fmt.Println("TEST6")
+	fmt.Println("TEST5")
+	fmt.Println("TEST4")
+	fmt.Println("TEST3")
+	fmt.Println("TEST2")
+	fmt.Println("TEST")
+	timerId, _ = strconv.Atoi(timerId.(string))
+
+	newDuration, _ := db.PauseTimer(timerId.(int), int64(pauseTime.(float64)))
+	w.Write([]byte(string(newDuration)))
+
+}
+
 func (this *TimerHandler) UpdateTimerTitle(w http.ResponseWriter, r *http.Request) {
 	db := db.Db{}
 	reqBody, _ := io.ReadAll(r.Body)

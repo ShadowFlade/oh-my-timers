@@ -21,6 +21,7 @@ func main() {
 	mux.Handle("/assets/", http.HandlerFunc(assetsHandler))
 	mux.HandleFunc("/createTimer", timerHandler.CreateTimer)
 	mux.HandleFunc("/pauseTimer", timerHandler.PauseTimer)
+	mux.HandleFunc("/pauseTimer", timerHandler.PauseTimer)
 	mux.HandleFunc("/startTimer", timerHandler.StartTimer)
 	mux.HandleFunc("/deleteTimer", timerHandler.DeleteTimer)
 	mux.HandleFunc("/createUser", timerHandler.CreateUser)

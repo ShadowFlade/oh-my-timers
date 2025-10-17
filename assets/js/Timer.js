@@ -113,6 +113,29 @@ class Timer {
 		});
 	}
 
+	/**
+	 * Сбрасывает время и останавливает таймер
+	 */
+	stop() {
+		this.isRunning = false;
+		this.startBtn.disabled = false;
+		this.pauseBtn.disabled = true;
+		const userId = this.timerContainer.dataset.userId;
+		const timer_id = this.timerContainer.dataset.id;
+
+		if (!userId || !timer_id) {
+			alert('Не удалось определить ID юзера или таймера');
+			return;
+		}
+		fetch(window.stopTimer, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({ userId, timer_id, pause_time }),
+		});
+	}
+
 	startUpdatingDisplay() {
 		this.startBtn.disabled = true;
 		this.pauseBtn.disabled = false;
