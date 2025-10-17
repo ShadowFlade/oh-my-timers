@@ -79,7 +79,6 @@ body {
 .timer-circle {
 	width: 8rem;
 	aspect-ratio: 1;
-	margin: 0 auto 2rem auto;
 	border: 2px solid #111827;
 	border-radius: 50%;
 	display: flex;
@@ -193,4 +192,16 @@ body {
 
 .add-timer-btn:hover {
 	background-color: #374151;
+}
+.timer-btn {
+	display: flex;
+	width: fit-content;
+}
+.timer-action-icon {
+	width:20px;
+	aspect-ratio: 1;
+}
+.timer__buttons {
+	display:flex;
+	flex-direction: column;
 }
