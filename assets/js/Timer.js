@@ -22,6 +22,7 @@ class Timer {
 		this.timerDisplay = this.timerContainer.querySelector('.js-timer-display');
 		this.startBtn = this.timerContainer.querySelector('.js-start-btn');
 		this.pauseBtn = this.timerContainer.querySelector('.js-pause-btn');
+		this.stopBtn = this.timerContainer.querySelector('.js-stop-btn');
 		this.form = this.timerContainer.querySelector('.js-form');
 		this.deleteBtn = this.timerContainer.querySelector('.js-delete-btn');
 		this.titleInput = this.timerContainer.querySelector('.js-timer-title')
@@ -37,6 +38,7 @@ class Timer {
 	bindEvents() {
 		this.startBtn.addEventListener('click', () => this.start());
 		this.pauseBtn.addEventListener('click', () => this.pause());
+		this.stopBtn.addEventListener('click',() => this.stop())
 		this.form.addEventListener('submit', (e) => this.handleSubmit(e));
 		this.deleteBtn.addEventListener('click', (e) => this.delete(e));
 		this.titleInput.addEventListener('blur', (e) => this.handleTimerTitleChange(e))
@@ -93,6 +95,7 @@ class Timer {
 		this.isRunning = false;
 		this.startBtn.disabled = false;
 		this.pauseBtn.disabled = true;
+	
 		clearInterval(this.interval);
 
 		const userId = this.timerContainer.dataset.userId;
@@ -116,7 +119,8 @@ class Timer {
 	/**
 	 * Сбрасывает время и останавливает таймер
 	 */
-	stop() {
+	async stop() {
+		const stop_time = Date.now()
 		this.isRunning = false;
 		this.startBtn.disabled = false;
 		this.pauseBtn.disabled = true;
@@ -127,18 +131,25 @@ class Timer {
 			alert('Не удалось определить ID юзера или таймера');
 			return;
 		}
-		fetch(window.stopTimer, {
+		const resp = await fetch(window.stopTimer, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
 			},
-			body: JSON.stringify({ userId, timer_id, pause_time }),
+			body: JSON.stringify({ userId, timer_id, stop_time }),
 		});
+		const data = await resp.json();
+		console.log(data,' data');
+
 	}
+
+
 
 	startUpdatingDisplay() {
 		this.startBtn.disabled = true;
 		this.pauseBtn.disabled = false;
+		this.stopBtn.disabled = false;
+		
 
 		this.interval = setInterval(() => {
 			this.seconds++;
@@ -148,8 +159,6 @@ class Timer {
 
 	updateDisplay() {
 		const hours = Math.floor(this.seconds / 3600);
-		console.log(hours,' hours')
-
 		const remainingSeconds = this.seconds % 3600;
 		const minutes = Math.floor(remainingSeconds / 60);
 		const seconds = remainingSeconds % 60;

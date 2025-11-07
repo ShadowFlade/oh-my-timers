@@ -149,7 +149,7 @@ func (this *TimerHandler) StopTimer(w http.ResponseWriter, r *http.Request) {
 	var response map[string]interface{}
 	json.Unmarshal(body, &response)
 	timerId := response["timer_id"]
-	pauseTime := response["pause_time"]
+	stopTime := response["stop_time"]
 	if timerId == 0 || timerId == nil {
 
 		return
@@ -164,7 +164,7 @@ func (this *TimerHandler) StopTimer(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("TEST")
 	timerId, _ = strconv.Atoi(timerId.(string))
 
-	newDuration, _ := db.PauseTimer(timerId.(int), int64(pauseTime.(float64)))
+	newDuration, _ := db.PauseTimer(timerId.(int), int64(stopTime.(float64)))
 	w.Write([]byte(string(newDuration)))
 
 }
@@ -252,11 +252,12 @@ func (this *TimerHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
 	userDb := DB.User{}
 	user := interfaces.NewUser("USER", hashedPassword)
 	newUserID := userDb.CreateUser(user)
+	maxAge := 3600 * 24 * 7 * 52
 	cookie := &http.Cookie{
 		Name:     "user_id",
 		Value:    strconv.Itoa(int(newUserID)),
 		Path:     "/",
-		MaxAge:   3600 * 24 * 7,
+		MaxAge:   maxAge,
 		HttpOnly: true,
 		Secure:   true,
 		SameSite: http.SameSiteLaxMode,
@@ -265,9 +266,9 @@ func (this *TimerHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
 
 	detectCookie := &http.Cookie{
 		Name:     "user_id_detected",
-		Value:    "1", // Simple flag
+		Value:    "1",
 		Path:     "/",
-		MaxAge:   3600 * 24 * 7,
+		MaxAge:   maxAge,
 		HttpOnly: false,
 		Secure:   true,
 		SameSite: http.SameSiteStrictMode,

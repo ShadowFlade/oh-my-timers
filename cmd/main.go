@@ -21,7 +21,7 @@ func main() {
 	mux.Handle("/assets/", http.HandlerFunc(assetsHandler))
 	mux.HandleFunc("/createTimer", timerHandler.CreateTimer)
 	mux.HandleFunc("/pauseTimer", timerHandler.PauseTimer)
-	mux.HandleFunc("/pauseTimer", timerHandler.PauseTimer)
+	mux.HandleFunc("/stopTimer", timerHandler.StopTimer)
 	mux.HandleFunc("/startTimer", timerHandler.StartTimer)
 	mux.HandleFunc("/deleteTimer", timerHandler.DeleteTimer)
 	mux.HandleFunc("/createUser", timerHandler.CreateUser)
@@ -77,7 +77,7 @@ func assetsHandler(w http.ResponseWriter, r *http.Request) {
 	// Кеширование
 	cacheControlHeader := ""
 	if env.Get("IS_PROD", "Y") == "Y" {
-		cacheControlHeader = "public, max-age=86400"
+		cacheControlHeader = "public, max-age=" + env.Get("MAX_AGE_CACHE_TIME", "86400")
 	} else {
 		cacheControlHeader = "no-cache, no-store, must-revalidate"
 	}
