@@ -175,18 +175,15 @@ func (this *TimerHandler) UpdateTimerTitle(w http.ResponseWriter, r *http.Reques
 	var body map[string]interface{}
 	json.Unmarshal(reqBody, body)
 	newTitle := body["newTitle"].(string)
-	if newTitle == "" {
+	timerId, err := strconv.Atoi(body["id"].(string))
+	if err != nil {
+		panic(err)
+	}
+	if newTitle == "" || timerId == 0 {
 		return
 	}
-	cookie, err := r.Cookie(global.COOKIE_USER_ID_NAME)
 
-	if err != nil {
-		panic(err.Error())
-	}
-
-	cookieVal := cookie.Value
-	userID, err := strconv.Atoi(cookieVal)
-	affectedId, err := db.UpdateTitle(newTitle, userID)
+	affectedId, err := db.UpdateTitle(newTitle, timerId)
 	if err != nil {
 		log.Panicf("Could not update timer title. Title: %s. Error: %s", newTitle, err.Error())
 	}
@@ -195,9 +192,8 @@ func (this *TimerHandler) UpdateTimerTitle(w http.ResponseWriter, r *http.Reques
 		Data:      affectedId,
 		Error:     "",
 	}
-	w.Write([]byte(resp.String()))
-	return
 
+	w.Write([]byte(resp.String()))
 }
 
 func (this *TimerHandler) DeleteTimer(w http.ResponseWriter, r *http.Request) {

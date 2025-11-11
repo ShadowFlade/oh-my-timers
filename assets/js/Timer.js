@@ -47,8 +47,12 @@ class Timer {
 	async handleTimerTitleChange(e) {
 		const target = e.target;
 		const newTitle = target.value;
+		const timerId = this.timerContainer.dataset.id;
+		if (!timerId) {
+			return;
+		}
 		fetch(window.updateTimerTitle, {
-			body:JSON.stringify({newTitle}),
+			body:JSON.stringify({newTitle, id: timerId}),
 			method:"POST",
 			headers: {
 				'Content-Type': 'application/json',
@@ -77,7 +81,6 @@ class Timer {
 	initTime() {
 		const runningSince = this.timerContainer.dataset.runningSince;
 		if (!runningSince) {
-			console.error(`Could not init time for timer ${this.id}`)
 			return; //TODO[quality]:make frontend logger (send to backend)
 		}
 		const runningSinceDate = new Date(runningSince);
