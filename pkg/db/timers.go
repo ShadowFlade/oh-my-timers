@@ -269,6 +269,33 @@ func (this *Db) UpdateTitle(title string, timerId int) (int64, error) {
 	return rowsAffected, nil
 }
 
+func (this *Db) RefreshTimer(timerId int) (int64, error) {
+	db := Db{}
+	err := db.Connect()
+	if err != nil {
+		log.Fatalf("Could not connect ot database updating title: %s", err.Error())
+	}
+	tx, err := db.db.Beginx()
+	if err != nil {
+		return 0, fmt.Errorf("failed to begin transaction: %w", err)
+	}
+	defer func() {
+		if tx != nil {
+			tx.Rollback()
+		}
+	}()
+	now := time.Now()
+	refreshTimerQuery := `update timers set running_since = ?, date_modified = ?, start = ?, duration = 0, `
+	result, err := tx.Exec(refreshTimerQuery, now, now, now)
+
+	rowsAffected, _ := result.RowsAffected()
+
+	tx = nil
+
+	return rowsAffected, nil
+
+}
+
 func (this *Db) DeleteTimer(timerId int64) (int, error) {
 	db := Db{}
 	err := db.Connect()

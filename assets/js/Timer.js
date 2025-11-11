@@ -26,10 +26,11 @@ class Timer {
 		this.form = this.timerContainer.querySelector('.js-form');
 		this.deleteBtn = this.timerContainer.querySelector('.js-delete-btn');
 		this.titleInput = this.timerContainer.querySelector('.js-timer-title')
+		this.refreshButton = this.timerContainer.querySelector('.js-refresh-btn')
 
 		this.id = +dataContainer.dataset['id'];
 		this.seconds = +dataContainer.dataset['duration'];
-		this.interval = null;
+		this.updatingDisplayInterval = null;
 		const runningSince = dataContainer.dataset['runningSince'];
 		const pausedAt = dataContainer.dataset['paused_at'];
 		this.isRunning = !!runningSince && !pausedAt;
@@ -39,6 +40,7 @@ class Timer {
 		this.startBtn.addEventListener('click', () => this.start());
 		this.pauseBtn.addEventListener('click', () => this.pause());
 		this.stopBtn.addEventListener('click',() => this.stop())
+		this.refreshButton.addEventListener('click', () => this.refresh())
 		this.form.addEventListener('submit', (e) => this.handleSubmit(e));
 		this.deleteBtn.addEventListener('click', (e) => this.delete(e));
 		this.titleInput.addEventListener('blur', (e) => this.handleTimerTitleChange(e))
@@ -99,7 +101,7 @@ class Timer {
 		this.startBtn.disabled = false;
 		this.pauseBtn.disabled = true;
 	
-		clearInterval(this.interval);
+		clearInterval(this.updatingDisplayInterval);
 
 		const userId = this.timerContainer.dataset.userId;
 		const timer_id = this.timerContainer.dataset.id;
@@ -154,7 +156,7 @@ class Timer {
 		this.stopBtn.disabled = false;
 		
 
-		this.interval = setInterval(() => {
+		this.updatingDisplayInterval = setInterval(() => {
 			this.seconds++;
 			this.updateDisplay();
 		}, 1000);
@@ -175,6 +177,21 @@ class Timer {
 		this.seconds = 0;
 		this.updateDisplay();
 		this.form.reset();
+	}
+
+	refresh() {
+		clearInterval(this.updatingDisplayInterval)
+		this.seconds = 0;
+		this.updateDisplay()
+		this.startUpdatingDisplay();
+		const timerId = +this.timerContainer.dataset.id;
+		fetch(window.refreshTimer, {
+			body:JSON.stringify({timerId}),
+			method:"POST",
+			headers: {
+				'Content-Type': 'application/json',
+			}
+		})
 	}
 
 	delete() {

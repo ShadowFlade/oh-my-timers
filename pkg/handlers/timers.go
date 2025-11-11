@@ -212,6 +212,19 @@ func (this *TimerHandler) DeleteTimer(w http.ResponseWriter, r *http.Request) {
 
 }
 
+func (this *TimerHandler) RefreshTimer(w http.ResponseWriter, r *http.Request) {
+	db := db.Db{}
+	reqBody, _ := io.ReadAll(r.Body)
+	var body map[string]interface{}
+	json.Unmarshal(reqBody, &body)
+	timerId := body["timerId"].(float64)
+	res, err := db.RefreshTimer(int(timerId))
+	if err != nil {
+		panic(err)
+	}
+	w.Write(string(res))
+}
+
 func (this *TimerHandler) UpdateTimer(w http.ResponseWriter, r *http.Request) {
 
 }
