@@ -3,12 +3,13 @@ package db
 import (
 	"fmt"
 	"log"
-	"shadowflade/timers/pkg/interfaces"
-	"shadowflade/timers/pkg/services"
 	"strconv"
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
+
+	"shadowflade/timers/pkg/interfaces"
+	"shadowflade/timers/pkg/services"
 )
 
 type Timer struct {
@@ -60,7 +61,7 @@ func (this *Db) CreateTimer(timer interfaces.Timer) (int64, error) {
 		return 0, fmt.Errorf("failed to connect to database: %w", err)
 	}
 
-	tx, err := db.db.Beginx() // Use Beginx instead of MustBegin for better error handling
+	tx, err := db.db.Beginx() //why use BeginxX and not MustBegin?
 	if err != nil {
 		return 0, fmt.Errorf("failed to begin transaction: %w", err)
 	}
