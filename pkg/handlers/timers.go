@@ -197,6 +197,33 @@ func (this *TimerHandler) UpdateTimerTitle(w http.ResponseWriter, r *http.Reques
 	w.Write([]byte(resp.String()))
 }
 
+func (this *TimerHandler) AddUpdateTimerColor(w http.ResponseWriter, r *http.Request) {
+	db := db.Db{}
+	reqBody, _ := io.ReadAll(r.Body)
+	var body map[string]interface{}
+	json.Unmarshal(reqBody, body)
+	color := body["color"].(string)
+	timerId, err := strconv.Atoi(body["id"].(string))
+	if err != nil {
+		panic(err)
+	}
+	if color == "" || timerId == 0 {
+		return
+	}
+
+	affectedId, err := db.UpdateTitle(newTitle, timerId)
+	if err != nil {
+		log.Panicf("Could not update timer title. Title: %s. Error: %s", newTitle, err.Error())
+	}
+	resp := interfaces.JsonResponse{
+		IsSuccess: true,
+		Data:      affectedId,
+		Error:     "",
+	}
+
+	w.Write([]byte(resp.String()))
+}
+
 func (this *TimerHandler) DeleteTimer(w http.ResponseWriter, r *http.Request) {
 	db := db.Db{}
 	reqBody, _ := io.ReadAll(r.Body)
