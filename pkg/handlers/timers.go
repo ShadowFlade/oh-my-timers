@@ -163,8 +163,10 @@ func (this *TimerHandler) StopTimer(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("TEST")
 	timerId, _ = strconv.Atoi(timerId.(string))
 
-	newDuration, _ := db.StopTimer(timerId.(int))
-	w.Write([]byte(string(newDuration)))
+	rowsAffected, _ := db.StopTimer(timerId.(int))
+
+	w.Header().Set("Content-Type", "text/plain")
+	w.Write([]byte(fmt.Sprint(rowsAffected)))
 
 }
 

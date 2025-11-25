@@ -87,6 +87,9 @@ body {
 	align-items: center;
 	justify-content: center;
 }
+.timer-circle--active {
+	border: 5px solid green;
+}
 
 .timer-display {
 	font-size: 1em;

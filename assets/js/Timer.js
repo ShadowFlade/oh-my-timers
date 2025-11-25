@@ -12,6 +12,9 @@ class Timer {
 		if (this.isRunning) {
 			this.startUpdatingDisplay();
 		}
+		this.cssClasses = {
+			timerCircleRunning:"timer-circle--active"
+		}
 	}
 
 	/**
@@ -19,6 +22,7 @@ class Timer {
 	 * @param {HTMLElement} dataContainer
 	 */
 	setupState(dataContainer) {
+		this.timerCircle = this.timerContainer.querySelector('.js-timer-circle')
 		this.timerDisplay = this.timerContainer.querySelector('.js-timer-display');
 		this.startBtn = this.timerContainer.querySelector('.js-start-btn');
 		this.pauseBtn = this.timerContainer.querySelector('.js-pause-btn');
@@ -78,6 +82,7 @@ class Timer {
 		});
 		const data = await resp.json();
 		this.startUpdatingDisplay();
+		this.updateCssClasses();
 	}
 
 	initTime() {
@@ -148,8 +153,8 @@ class Timer {
 			body: JSON.stringify({ userId, timer_id, stop_time }),
 		});
 		const data = await resp.json();
+		this.updateCssClasses();
 		console.log(data,' data');
-
 	}
 
 
@@ -206,5 +211,25 @@ class Timer {
 		if (this.isRunning) {
 			this.pause();
 		}
+	}
+
+	updateCssClasses() {
+		const circleRunningClass = this.cssClasses.timerCircleRunning
+		
+		if (
+			this.isRunning 
+			&& !this.timerCircle.classList.contains(circleRunningClass)
+		) {
+			this.timerCircle.classList.add(circleRunningClass)
+		}
+		console.log(this.timerCircle, ' timer circle', this.isRunning);
+
+		if (
+			!this.isRunning
+			&& this.timerCircle.classList.contains(circleRunningClass)
+		) {
+			console.log('removing');
+				this.timerCircle.classList.remove(circleRunningClass)
+			}
 	}
 }
