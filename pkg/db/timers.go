@@ -219,6 +219,47 @@ func (this *Db) PauseTimer(timerId int, pauseTime int64) (int64, error) {
 
 }
 
+func (this *Db) StopTimer(timerId int) (int64, error) {
+	db := Db{}
+	err := db.Connect()
+	if err != nil {
+		return 0, fmt.Errorf("failed to connect to database: %w", err)
+	}
+
+	tx, err := db.db.Beginx()
+	if err != nil {
+		return 0, fmt.Errorf("failed to begin transaction: %w", err)
+	}
+	defer func() {
+		if tx != nil {
+			tx.Rollback()
+		}
+	}()
+	stopTimerQuery := `update timers set duration = 0, running_since = null where id = ?`
+	result, err := tx.Exec(
+		stopTimerQuery,
+		timerId,
+	)
+	if err != nil {
+		log.Panicf("Query: %s \n failed to update timer.\n Timer id : %s",
+			stopTimerQuery,
+			err,
+		)
+	}
+
+	if err := tx.Commit(); err != nil {
+		log.Panicf("failed to commit: %w", err)
+	}
+	tx = nil // prevent rollback
+
+	// Optional: get affected rows
+	rowsAffected, _ := result.RowsAffected()
+	fmt.Printf("Updated %d rows\n", rowsAffected)
+
+	return rowsAffected, nil
+
+}
+
 func (this *Db) GetTimerById(timerId int) interfaces.Timer {
 	db := Db{}
 	err := db.Connect()

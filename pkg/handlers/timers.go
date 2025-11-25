@@ -149,9 +149,8 @@ func (this *TimerHandler) StopTimer(w http.ResponseWriter, r *http.Request) {
 	var response map[string]interface{}
 	json.Unmarshal(body, &response)
 	timerId := response["timer_id"]
-	stopTime := response["stop_time"]
-	if timerId == 0 || timerId == nil {
 
+	if timerId == 0 || timerId == nil {
 		return
 	}
 
@@ -164,7 +163,7 @@ func (this *TimerHandler) StopTimer(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("TEST")
 	timerId, _ = strconv.Atoi(timerId.(string))
 
-	newDuration, _ := db.PauseTimer(timerId.(int), int64(stopTime.(float64)))
+	newDuration, _ := db.StopTimer(timerId.(int))
 	w.Write([]byte(string(newDuration)))
 
 }
@@ -222,7 +221,7 @@ func (this *TimerHandler) RefreshTimer(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		panic(err)
 	}
-	w.Write(string(res))
+	w.Write([]byte(string(res)))
 }
 
 func (this *TimerHandler) UpdateTimer(w http.ResponseWriter, r *http.Request) {

@@ -126,6 +126,10 @@ class Timer {
 	 */
 	async stop() {
 		const stop_time = Date.now()
+		this.seconds = 0;
+		this.updateDisplay();
+		clearInterval(this.updatingDisplayInterval);
+		this.runn
 		this.isRunning = false;
 		this.startBtn.disabled = false;
 		this.pauseBtn.disabled = true;
