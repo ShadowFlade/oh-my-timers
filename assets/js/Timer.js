@@ -13,7 +13,8 @@ class Timer {
 			this.startUpdatingDisplay();
 		}
 		this.cssClasses = {
-			timerCircleRunning:"timer-circle--active"
+			timerCircleRunning:"timer-circle--active",
+			timerCircleStaleUserCustom:"timer-circle--user-stale"
 		}
 	}
 
@@ -31,6 +32,7 @@ class Timer {
 		this.deleteBtn = this.timerContainer.querySelector('.js-delete-btn');
 		this.titleInput = this.timerContainer.querySelector('.js-timer-title')
 		this.refreshButton = this.timerContainer.querySelector('.js-refresh-btn')
+		this.colorPicker = this.timerContainer.querySelector('.js-timer-color-picker')
 
 		this.id = +dataContainer.dataset['id'];
 		this.seconds = +dataContainer.dataset['duration'];
@@ -48,6 +50,15 @@ class Timer {
 		this.form.addEventListener('submit', (e) => this.handleSubmit(e));
 		this.deleteBtn.addEventListener('click', (e) => this.delete(e));
 		this.titleInput.addEventListener('blur', (e) => this.handleTimerTitleChange(e))
+		this.colorPicker.addEventListener('change', this.handleTimerColorChange.bind(this))
+	}
+	/**
+	 * 
+	 * @param {Event} e 
+	 */
+	handleTimerColorChange(e) {
+		const newColor = e.currentTarget.value;
+		this.timerCircle.style.borderColor = newColor;
 	}
 
 	async handleTimerTitleChange(e) {
@@ -166,8 +177,8 @@ class Timer {
 		
 
 		this.updatingDisplayInterval = setInterval(() => {
-			this.seconds++;
 			this.updateDisplay();
+			this.seconds++;
 		}, 1000);
 	}
 
