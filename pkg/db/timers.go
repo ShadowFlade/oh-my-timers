@@ -286,11 +286,11 @@ func (this *Db) GetTimerById(timerId int) interfaces.Timer {
 
 }
 
-func (this *Db) AddOrUpdateTimerTitle(timerId int, color string) (int64, error) {
+func (this *Db) AddOrUpdateTimerColor(timerId int, color string) (int64, error) {
 	db := Db{}
 	err := db.Connect()
 	if err != nil {
-		log.Fatalf("Could not connect ot database updating title: %s", err.Error())
+		log.Fatalf("Could not connect ot database updating timer color: %s", err.Error())
 	}
 	tx, err := db.db.Beginx()
 	if err != nil {
@@ -301,8 +301,8 @@ func (this *Db) AddOrUpdateTimerTitle(timerId int, color string) (int64, error) 
 			tx.Rollback()
 		}
 	}()
-	updateTitleQuery := `update timers set title = ? where id = ?;`
-	result, err := tx.Exec(updateTitleQuery, title, timerId)
+	updateTitleQuery := `update timers set color = ? where id = ?;`
+	result, err := tx.Exec(updateTitleQuery, color, timerId)
 	rowsAffected, _ := result.RowsAffected()
 
 	tx = nil
