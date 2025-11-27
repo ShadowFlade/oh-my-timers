@@ -24,7 +24,9 @@
         </div>
 
         <div class="timer-section">
-            <div class="js-timer-circle timer-circle {{if .RunningSince.Value}}timer-circle--active{{end}}">
+            <div class="js-timer-circle timer-circle {{if .RunningSince.Value}}timer-circle--active{{end}}"
+                style="border-color:{{.Color}}"
+            >
                 <div class="timer-display js-timer-display" id="timerDisplay">
                     {{.FormattedDuration}}
                 </div>

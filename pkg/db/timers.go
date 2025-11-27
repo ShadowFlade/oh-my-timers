@@ -25,7 +25,10 @@ func (this *Timer) GetAllUsersTimers(userID int) []interfaces.Timer {
 
 	userId := strconv.Itoa(userID)
 	fmt.Println(userID)
-	res, err := db.db.Queryx(fmt.Sprintf("select * from timers where user_id = %s order by start", userId))
+	res, err := db.db.Queryx(fmt.Sprintf(
+		"select * from timers where user_id = %s order by start",
+		userId,
+	))
 
 	if err != nil {
 		panic(err.Error())
