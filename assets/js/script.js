@@ -11,6 +11,6 @@ window.stopTimer = '/stopTimer';
 window.refreshTimer = '/refreshTimer'
 window.deleteTimer = '/deleteTimer';
 window.startTimer = '/startTimer';
-
+window.updateTimerColor = "/updateTimerColor"
 window.updateTimerTitle = '/updateTimerTitle';
 window.home = '/';

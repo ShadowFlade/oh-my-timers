@@ -58,7 +58,16 @@ class Timer {
 	 */
 	handleTimerColorChange(e) {
 		const newColor = e.currentTarget.value;
+		console.log(e.currentTarget,' cur target');
 		this.timerCircle.style.borderColor = newColor;
+		const timerId = this.timerContainer.dataset.id;
+		fetch(window.updateTimerColor, {
+			body:JSON.stringify({color: newColor, id: timerId}),
+			method:"POST",
+			headers: {
+				'Content-Type': 'application/json',
+			}
+		})
 	}
 
 	async handleTimerTitleChange(e) {

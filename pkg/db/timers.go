@@ -301,8 +301,10 @@ func (this *Db) AddOrUpdateTimerColor(timerId int, color string) (int64, error) 
 			tx.Rollback()
 		}
 	}()
-	updateTitleQuery := `update timers set color = ? where id = ?;`
-	result, err := tx.Exec(updateTitleQuery, color, timerId)
+
+	updateTitleQuery := `insert into timers (id, color) values (?,?) on duplicate key update color = ?;`
+
+	result, err := tx.Exec(updateTitleQuery, timerId, color, color)
 	rowsAffected, _ := result.RowsAffected()
 
 	tx = nil
