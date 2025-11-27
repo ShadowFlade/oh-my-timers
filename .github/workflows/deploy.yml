@@ -23,6 +23,7 @@ jobs:
             git config --global --add safe.directory /home/projects/oh-my-timers
             # Включить режим "остановиться при первой ошибке"
             set -e
+            source ~/.bashrc
             cd /home/projects/oh-my-timers || exit 1
             echo "[$(date)] Начало деплоя" >> /var/log/deploy.log
             {
