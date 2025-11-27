@@ -6,13 +6,14 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"strconv"
+
 	"shadowflade/timers/pkg/db"
 	DB "shadowflade/timers/pkg/db"
 	"shadowflade/timers/pkg/global"
 	"shadowflade/timers/pkg/interfaces"
 	"shadowflade/timers/pkg/services"
 	"shadowflade/timers/pkg/views"
-	"strconv"
 )
 
 type TimerHandler struct {
@@ -127,6 +128,7 @@ func (this *TimerHandler) PauseTimer(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	fmt.Println("TEST8")
 	fmt.Println("TEST7")
 	fmt.Println("TEST6")
 	fmt.Println("TEST5")
