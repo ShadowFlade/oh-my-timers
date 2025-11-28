@@ -16,7 +16,7 @@ func main() {
 	// fileServer := http.FileServer(http.Dir("./assets/"))
 
 	mux := http.NewServeMux()
-	mux.Handle("/assets/", assetsHandler)
+	mux.HandleFunc("/assets/", assetsHandler)
 	mux.HandleFunc("/createTimer", timerHandler.CreateTimer)
 	mux.HandleFunc("/pauseTimer", timerHandler.PauseTimer)
 	mux.HandleFunc("/startTimer", timerHandler.StartTimer)
