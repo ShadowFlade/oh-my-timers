@@ -128,6 +128,7 @@ func (this *TimerHandler) PauseTimer(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	fmt.Println("TEST11")
 	fmt.Println("TEST10")
 	fmt.Println("TEST9")
 
