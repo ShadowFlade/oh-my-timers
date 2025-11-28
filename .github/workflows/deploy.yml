@@ -2,7 +2,9 @@ name: Deploy to Production
 
 on:
   push:
-    branches: [ master ]
+    branches: [master]
+  pull_request:
+    branches: [master]
 
 jobs:
   deploy:
@@ -11,8 +13,46 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.17
+      - name: Verify dependencies
+        run: go mod verify
+      - name: Build
+        run: go build cmd/main.go
 
-      - name: Deploy to server via SSH
+      - name: Run go vet
+        run: go vet ./...
+
+      - name: Install staticcheck
+        run: go install honnef.co/go/tools/cmd/staticcheck@latest
+
+      - name: Run staticcheck
+        run: staticcheck ./...
+
+      - name: Install golint
+        run: go install golang.org/x/lint/golint@latest
+
+      - name: Run golint
+        run: golint ./...
+
+      - name: SCP to server
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 
+          source: "main"         
+          target: "/home/projects/oh-my-timers/main"
+          script: echo "[$(date)] Начало билда" >> /var/log/deploy.log
+            {
+              echo "Продолжение билда"
+            }  2>&1 | tee -a /var/log/deploy.log
+            echo "[$(date)] Завершено" >> /var/log/deploy.log
+      
+      - name: Git pull + assets gzip
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.HOST }}
@@ -21,18 +61,15 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             git config --global --add safe.directory /home/projects/oh-my-timers
-            # Включить режим "остановиться при первой ошибке"
             source ~/.bash_profile || source ~/.bashrc || true
             set -e
-            
+            # Включить режим "остановиться при первой ошибке"
             cd /home/projects/oh-my-timers || exit 1
             echo "[$(date)] Начало деплоя" >> /var/log/deploy.log
             {
               git pull origin master
               find assets/js -type f -name "*.js" -exec gzip -f -k -9 {} \;
               find assets -type f -name "*.css" -exec gzip -f -k -9 {} \;
-              go build cmd/main.go
-              sudo systemctl restart oh-my-timers
-              echo "✅ Успешно"
+              echo "✅ Успешно спулено и собраны ассеты"
             }  2>&1 | tee -a /var/log/deploy.log
             echo "[$(date)] Завершено" >> /var/log/deploy.log
