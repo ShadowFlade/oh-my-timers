@@ -143,7 +143,7 @@ func (this *TimerHandler) PauseTimer(w http.ResponseWriter, r *http.Request) {
 	timerId, _ = strconv.Atoi(timerId.(string))
 
 	newDuration, _ := db.PauseTimer(timerId.(int), int64(pauseTime.(float64)))
-	w.Write([]byte(string(newDuration)))
+	w.Write([]byte(fmt.Sprint(newDuration)))
 
 }
 
@@ -151,7 +151,7 @@ func (this *TimerHandler) UpdateTimerTitle(w http.ResponseWriter, r *http.Reques
 	db := db.Db{}
 	reqBody, _ := io.ReadAll(r.Body)
 	var body map[string]interface{}
-	json.Unmarshal(reqBody, body)
+	json.Unmarshal(reqBody, &body)
 	newTitle := body["newTitle"].(string)
 	if newTitle == "" {
 		return
@@ -185,7 +185,7 @@ func (this *TimerHandler) DeleteTimer(w http.ResponseWriter, r *http.Request) {
 	json.Unmarshal(reqBody, &body)
 	timerId := body["timer_id"].(float64)
 	if timerId == 0 {
-		log.Panicln("Timer id is 0 from json body: %s", string(reqBody))
+		log.Panicf("Timer id is 0 from json body: %s", string(reqBody))
 	}
 	fmt.Println(timerId, "timer id to delete", string(reqBody))
 	rowsAffected, _ := db.DeleteTimer(int64(timerId))

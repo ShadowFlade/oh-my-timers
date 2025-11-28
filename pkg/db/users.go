@@ -2,6 +2,7 @@ package db
 
 import (
 	"log"
+
 	"shadowflade/timers/pkg/interfaces"
 )
 
@@ -18,7 +19,7 @@ func (this *User) CreateUser(user interfaces.User) int64 {
 
 	res, err := db.db.NamedExec(query, user)
 	if err != nil {
-		log.Fatalf("Error on creating user. Query: %s", query, err.Error())
+		log.Fatalf("Error on creating user. Query: %s. Err: %s", query, err.Error())
 	}
 	newId, err := res.LastInsertId()
 	if err != nil {

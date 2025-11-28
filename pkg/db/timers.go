@@ -3,12 +3,13 @@ package db
 import (
 	"fmt"
 	"log"
-	"shadowflade/timers/pkg/interfaces"
-	"shadowflade/timers/pkg/services"
 	"strconv"
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
+
+	"shadowflade/timers/pkg/interfaces"
+	"shadowflade/timers/pkg/services"
 )
 
 type Timer struct {
@@ -172,7 +173,13 @@ func (this *Db) PauseTimer(timerId int, pauseTime int64) (int64, error) {
 	// Calculate elapsed time
 	elapsedSeconds := int(time.Since(start).Seconds())
 	newDuration := userTimer.Duration + int64(elapsedSeconds)
-	fmt.Printf("elapsed: #%s, \nnewDuratino: %s, \nrunning since: %s, \nnow: %s", elapsedSeconds, newDuration, userTimer.RunningSince.Time, time.Now())
+	fmt.Printf(
+		"elapsed: #%d, \nnewDuratino: %d, \nrunning since: %s, \nnow: %s",
+		elapsedSeconds,
+		newDuration,
+		userTimer.RunningSince.Time,
+		time.Now(),
+	)
 
 	newPausedAt := time.Now()
 
@@ -202,11 +209,19 @@ func (this *Db) PauseTimer(timerId int, pauseTime int64) (int64, error) {
 		timerId,
 	)
 	if err != nil {
-		log.Panicf("Query: %s \n failed to update timer: %w.\nDuration: %s,\nuserTimer.Duration: %s,\n elapsedSeconds: %s.\n Timer id : %s", updateTimerDurationQuery, err, newDuration, userTimer.Duration, elapsedSeconds, userTimer.Id)
+		log.Panicf(
+			"Query: %s \n failed to update timer: %s.\nDuration: %d,\nuserTimer.Duration: %d,\n elapsedSeconds: %d.\n Timer id : %d",
+			updateTimerDurationQuery,
+			err.Error(),
+			newDuration,
+			userTimer.Duration,
+			elapsedSeconds,
+			userTimer.Id,
+		)
 	}
 
 	if err := tx.Commit(); err != nil {
-		log.Panicf("failed to commit: %w", err)
+		log.Panicf("%s", err.Error())
 	}
 	tx = nil // prevent rollback
 
@@ -288,7 +303,11 @@ func (this *Db) DeleteTimer(timerId int64) (int, error) {
 
 	result, err := tx.Exec(deleteTimerQuery, timerId)
 	if err != nil {
-		log.Fatalln("Could not delete timer with id: %d. Error: %s", timerId, err.Error())
+		log.Fatalf(
+			"Could not delete timer with id: %d. Error: %s",
+			timerId,
+			err.Error(),
+		)
 	}
 	rowsAffected, err := result.RowsAffected()
 	tx.Commit()
