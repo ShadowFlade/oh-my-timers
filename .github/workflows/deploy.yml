@@ -46,13 +46,25 @@ jobs:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          port: 
+          port: 22
           source: "main"         
           target: "/home/projects/oh-my-timers/main"
-          script: echo "[$(date)] Начало билда" >> /var/log/deploy.log
+      
+      - name : Deploy
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          script: |
+            echo "[$(date)] Начало билда" >> /var/log/deploy.log
             {
               echo "Продолжение билда"
-            }  2>&1 | tee -a /var/log/deploy.log
+              # Добавьте ваши команды деплоя здесь
+              cd /home/projects/oh-my-timers
+              sudo systemctl restart oh-my-timers
+            } 2>&1 | tee -a /var/log/deploy.log
             echo "[$(date)] Завершено" >> /var/log/deploy.log
       
       - name: Git pull + assets gzip
