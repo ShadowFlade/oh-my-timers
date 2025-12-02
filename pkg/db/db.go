@@ -41,3 +41,8 @@ func (this *Db) Connect() error {
 
 	return nil
 }
+
+
+func (this *Db) runStartUpMigrations() {
+
+}
