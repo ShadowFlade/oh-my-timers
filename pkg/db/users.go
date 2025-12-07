@@ -7,17 +7,24 @@ import (
 )
 
 type User struct {
+	TableName string
+}
+
+func (this *User) Create() *User {
+	return &User{
+		TableName: "users",
+	}
 }
 
 func (this *User) CreateUser(user interfaces.User) int64 {
 	db := Db{}
 	db.Connect()
-	tx := db.db.MustBegin()
+	tx := db.Db.MustBegin()
 	query := `
 	insert into users (name, password) values (:name, :password)
 	`
 
-	res, err := db.db.NamedExec(query, user)
+	res, err := db.Db.NamedExec(query, user)
 	if err != nil {
 		log.Fatalf("Error on creating user. Query: %s. Err: %s", query, err.Error())
 	}

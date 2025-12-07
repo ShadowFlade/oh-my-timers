@@ -13,6 +13,13 @@ import (
 )
 
 type Timer struct {
+	TableName string
+}
+
+func (this *Timer) Create() *Timer {
+	return &Timer{
+		TableName: "timers",
+	}
 }
 
 func (this *Timer) GetAllUsersTimers(userID int) []interfaces.Timer {
@@ -21,11 +28,11 @@ func (this *Timer) GetAllUsersTimers(userID int) []interfaces.Timer {
 	if err != nil {
 		panic(err.Error())
 	}
-	tx := db.db.MustBegin()
+	tx := db.Db.MustBegin()
 
 	userId := strconv.Itoa(userID)
 	fmt.Println(userID)
-	res, err := db.db.Queryx(fmt.Sprintf("select * from timers where user_id = %s order by start", userId))
+	res, err := db.Db.Queryx(fmt.Sprintf("select * from timers where user_id = %s order by start", userId))
 
 	if err != nil {
 		panic(err.Error())
@@ -61,7 +68,7 @@ func (this *Db) CreateTimer(timer interfaces.Timer) (int64, error) {
 		return 0, fmt.Errorf("failed to connect to database: %w", err)
 	}
 
-	tx, err := db.db.Beginx() // Use Beginx instead of MustBegin for better error handling
+	tx, err := db.Db.Beginx() // Use Beginx instead of MustBegin for better error handling
 	if err != nil {
 		return 0, fmt.Errorf("failed to begin transaction: %w", err)
 	}
@@ -115,7 +122,7 @@ func (this *Db) StartTimer(timerId int, startTime int64) (int64, error) {
 	}
 	sTime := time.Unix(startTime, 0)
 	query := `update timers set running_since = ?, date_modified = ? where id = ?;`
-	tx, err := db.db.Beginx()
+	tx, err := db.Db.Beginx()
 	if err != nil {
 		return 0, fmt.Errorf("failed to begin transaction: %w", err)
 	}
@@ -190,7 +197,7 @@ func (this *Db) PauseTimer(timerId int, pauseTime int64) (int64, error) {
 		SET duration = ?, paused_at = ?, running_since = null, date_modified = ?
 		WHERE id = ?`
 
-	tx, err := db.db.Beginx()
+	tx, err := db.Db.Beginx()
 	if err != nil {
 		return 0, fmt.Errorf("failed to begin transaction: %w", err)
 	}
@@ -236,7 +243,7 @@ func (this *Db) PauseTimer(timerId int, pauseTime int64) (int64, error) {
 func (this *Db) GetTimerById(timerId int) interfaces.Timer {
 	db := Db{}
 	err := db.Connect()
-	res, err := db.db.Queryx(
+	res, err := db.Db.Queryx(
 		fmt.Sprintf("select * from timers where id = %d;", int(timerId)),
 	)
 
@@ -265,7 +272,7 @@ func (this *Db) UpdateTitle(title string, timerId int) (int64, error) {
 	if err != nil {
 		log.Fatalf("Could not connect ot database updating title: %s", err.Error())
 	}
-	tx, err := db.db.Beginx()
+	tx, err := db.Db.Beginx()
 	if err != nil {
 		return 0, fmt.Errorf("failed to begin transaction: %w", err)
 	}
@@ -289,7 +296,7 @@ func (this *Db) DeleteTimer(timerId int64) (int, error) {
 	if err != nil {
 		log.Fatalf("Could not connect ot database updating title: %s", err.Error())
 	}
-	tx, err := db.db.Beginx()
+	tx, err := db.Db.Beginx()
 	if err != nil {
 		return 0, fmt.Errorf("failed to begin transaction: %w", err)
 	}

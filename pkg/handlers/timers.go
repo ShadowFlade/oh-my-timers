@@ -56,7 +56,7 @@ func (this *TimerHandler) RenderUserTimers(w http.ResponseWriter, r *http.Reques
 
 func (this *TimerHandler) CreateTimer(w http.ResponseWriter, r *http.Request) {
 
-	db := DB.Db{}
+	db := db.Db{}
 	views := views.Views{}
 	templates := views.GetTemplates()
 	cookie, err := r.Cookie(global.COOKIE_USER_ID_NAME)
@@ -90,7 +90,7 @@ func (this *TimerHandler) CreateTimer(w http.ResponseWriter, r *http.Request) {
 }
 
 func (this *TimerHandler) StartTimer(w http.ResponseWriter, r *http.Request) {
-	db := DB.Db{}
+	db := db.Db{}
 	body, _ := io.ReadAll(r.Body)
 	var response map[string]interface{}
 	json.Unmarshal(body, &response)
@@ -117,7 +117,7 @@ func (this *TimerHandler) StartTimer(w http.ResponseWriter, r *http.Request) {
 }
 
 func (this *TimerHandler) PauseTimer(w http.ResponseWriter, r *http.Request) {
-	db := DB.Db{}
+	db := db.Db{}
 	body, _ := io.ReadAll(r.Body)
 	var response map[string]interface{}
 	json.Unmarshal(body, &response)

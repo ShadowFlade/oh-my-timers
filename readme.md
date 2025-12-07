@@ -1,3 +1,7 @@
+# DISCLAIMER
+
+This code style is disapproved by golang community and myself
+
 ### Start project
 `air`
 
