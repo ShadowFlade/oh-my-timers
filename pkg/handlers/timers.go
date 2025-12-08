@@ -255,7 +255,7 @@ func (this *TimerHandler) RefreshTimer(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		panic(err)
 	}
-	w.Write([]byte(string(res)))
+	w.Write([]byte(fmt.Sprint(res)))
 }
 
 func (this *TimerHandler) UpdateTimer(w http.ResponseWriter, r *http.Request) {

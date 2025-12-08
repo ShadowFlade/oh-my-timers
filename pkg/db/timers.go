@@ -269,7 +269,7 @@ func (this *Db) StopTimer(timerId int) (int64, error) {
 	}
 
 	if err := tx.Commit(); err != nil {
-		log.Panicf("failed to commit: %w", err)
+		log.Panicf("failed to commit: %s", err.Error())
 	}
 	tx = nil // prevent rollback
 
