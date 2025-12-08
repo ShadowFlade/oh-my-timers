@@ -74,7 +74,7 @@ class TimerManager {
 		const htmlElement = this.createTimerFromRawHtml(newTimerHtml);
 
 		this.timersContainer.appendChild(htmlElement);
-		htmlElement.tabIndex= this.lastTabIndex + 1;
+		htmlElement.tabIndex = this.lastTabIndex + 1;
 		this.lastTabIndex = this.lastTabIndex + 1;
 		const timer = new Timer(htmlElement);
 		this.timers.push(timer);

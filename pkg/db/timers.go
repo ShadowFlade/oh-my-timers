@@ -68,7 +68,7 @@ func (this *Db) CreateTimer(timer interfaces.Timer) (int64, error) {
 		return 0, fmt.Errorf("failed to connect to database: %w", err)
 	}
 
-	tx, err := db.Db.Beginx() // Use Beginx instead of MustBegin for better error handling
+	tx, err := db.Db.Beginx() //why use BeginxX and not MustBegin?
 	if err != nil {
 		return 0, fmt.Errorf("failed to begin transaction: %w", err)
 	}
@@ -240,6 +240,47 @@ func (this *Db) PauseTimer(timerId int, pauseTime int64) (int64, error) {
 
 }
 
+func (this *Db) StopTimer(timerId int) (int64, error) {
+	db := Db{}
+	err := db.Connect()
+	if err != nil {
+		return 0, fmt.Errorf("failed to connect to database: %w", err)
+	}
+
+	tx, err := db.Db.Beginx()
+	if err != nil {
+		return 0, fmt.Errorf("failed to begin transaction: %w", err)
+	}
+	defer func() {
+		if tx != nil {
+			tx.Rollback()
+		}
+	}()
+	stopTimerQuery := `update timers set duration = 0, running_since = null where id = ?`
+	result, err := tx.Exec(
+		stopTimerQuery,
+		timerId,
+	)
+	if err != nil {
+		log.Panicf("Query: %s \n failed to update timer.\n Timer id : %s",
+			stopTimerQuery,
+			err,
+		)
+	}
+
+	if err := tx.Commit(); err != nil {
+		log.Panicf("failed to commit: %s", err.Error())
+	}
+	tx = nil // prevent rollback
+
+	// Optional: get affected rows
+	rowsAffected, _ := result.RowsAffected()
+	fmt.Printf("Updated %d rows\n", rowsAffected)
+
+	return rowsAffected, nil
+
+}
+
 func (this *Db) GetTimerById(timerId int) interfaces.Timer {
 	db := Db{}
 	err := db.Connect()
@@ -266,6 +307,32 @@ func (this *Db) GetTimerById(timerId int) interfaces.Timer {
 
 }
 
+func (this *Db) AddOrUpdateTimerColor(timerId int, color string) (int64, error) {
+	db := Db{}
+	err := db.Connect()
+	if err != nil {
+		log.Fatalf("Could not connect ot database updating timer color: %s", err.Error())
+	}
+	tx, err := db.Db.Beginx()
+	if err != nil {
+		return 0, fmt.Errorf("failed to begin transaction: %w", err)
+	}
+	defer func() {
+		if tx != nil {
+			tx.Rollback()
+		}
+	}()
+
+	updateTitleQuery := `insert into timers (id, color) values (?,?) on duplicate key update color = ?;`
+
+	result, err := tx.Exec(updateTitleQuery, timerId, color, color)
+	rowsAffected, _ := result.RowsAffected()
+
+	tx = nil
+
+	return rowsAffected, nil
+}
+
 func (this *Db) UpdateTitle(title string, timerId int) (int64, error) {
 	db := Db{}
 	err := db.Connect()
@@ -288,6 +355,33 @@ func (this *Db) UpdateTitle(title string, timerId int) (int64, error) {
 	tx = nil
 
 	return rowsAffected, nil
+}
+
+func (this *Db) RefreshTimer(timerId int) (int64, error) {
+	db := Db{}
+	err := db.Connect()
+	if err != nil {
+		log.Fatalf("Could not connect ot database updating title: %s", err.Error())
+	}
+	tx, err := db.Db.Beginx()
+	if err != nil {
+		return 0, fmt.Errorf("failed to begin transaction: %w", err)
+	}
+	defer func() {
+		if tx != nil {
+			tx.Rollback()
+		}
+	}()
+	now := time.Now()
+	refreshTimerQuery := `update timers set running_since = ?, date_modified = ?, start = ?, duration = 0, `
+	result, err := tx.Exec(refreshTimerQuery, now, now, now)
+
+	rowsAffected, _ := result.RowsAffected()
+
+	tx = nil
+
+	return rowsAffected, nil
+
 }
 
 func (this *Db) DeleteTimer(timerId int64) (int, error) {
