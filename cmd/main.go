@@ -19,7 +19,10 @@ func main() {
 
 	mux := http.NewServeMux()
 	fmt.Println("slkdjflsdkjf")
+	fmt.Println("slkdjflsdkjf")
+
 	mux.HandleFunc("/assets/", assetsHandler)
+
 	mux.HandleFunc("/createTimer", timerHandler.CreateTimer)
 	mux.HandleFunc("/pauseTimer", timerHandler.PauseTimer)
 	mux.HandleFunc("/stopTimer", timerHandler.StopTimer)
