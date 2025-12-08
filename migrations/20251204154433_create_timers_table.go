@@ -15,23 +15,21 @@ func init() {
 }
 
 func upCreateTimersTable(ctx context.Context, tx *sql.Tx) error {
-	db := PkgDb.Db{}
 	dbUser := PkgDb.Timer{}
 	timerDb := dbUser.Create()
 
 	timersTableName := timerDb.TableName
-	rows, err := db.Db.Query("SHOW TABLES LIKE %s;", timersTableName)
+	var isTimersTableAlreadyExists bool
 
-	if err != nil {
-		log.Panic(err.Error())
-	}
+	err := tx.QueryRow(fmt.Sprintf("SHOW TABLES LIKE %s;", timersTableName)).Scan(&isTimersTableAlreadyExists)
 
-	if !rows.Next() {
+	if err == nil {
+		fmt.Println("Table timers already exists")
 		return nil
 	}
 
-	query := `
-	CREATE TABLE timers (
+	query := fmt.Sprintf(`
+	CREATE TABLE %s (
 		id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
 		user_id INT DEFAULT NULL,
 		start DATETIME DEFAULT NULL,
@@ -44,11 +42,11 @@ func upCreateTimersTable(ctx context.Context, tx *sql.Tx) error {
 		title VARCHAR(255) DEFAULT NULL,
 		color VARCHAR(255) DEFAULT NULL
 	)
-	`
+	`, timersTableName)
 
-	res, err := db.Db.NamedExec(query, timersTableName)
+	res, createTableError := tx.Exec(query)
 
-	if err != nil {
+	if createTableError != nil {
 		tx.Rollback()
 		log.Panic(err.Error())
 	}
