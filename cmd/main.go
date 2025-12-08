@@ -9,6 +9,7 @@ import (
 
 	"shadowflade/timers/pkg/global"
 	"shadowflade/timers/pkg/handlers"
+	"shadowflade/timers/pkg/views"
 )
 
 func main() {
@@ -24,8 +25,13 @@ func main() {
 	mux.HandleFunc("/createUser", timerHandler.CreateUser)
 	mux.HandleFunc("/updateTimerTittle", timerHandler.UpdateTimerTitle)
 	mux.HandleFunc("/", timerHandler.RenderUserTimers)
+	err := http.ListenAndServe(":"+global.PORT, mux)
 
-	log.Fatal(http.ListenAndServe(":"+global.PORT, mux))
+	if err != nil {
+		log.Writer().Write([]byte(err.Error()))
+	}
+	log.Fatal()
+
 }
 
 func init() {
@@ -64,4 +70,11 @@ func assetsHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Отдаем файл
 	http.ServeFile(w, r, "./assets/"+path)
+}
+
+func showErrorPage(w http.ResponseWriter, r *http.Request) {
+	views := views.Views{}
+
+	templates := views.GetTemplates()
+	templates.ExecuteTemplate(w, "error", make(map[string]int))
 }
