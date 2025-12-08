@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"log"
 	PkgDb "shadowflade/timers/pkg/db"
 
@@ -15,7 +16,6 @@ func init() {
 
 func upCreateTimersTable(ctx context.Context, tx *sql.Tx) error {
 	db := PkgDb.Db{}
-	db.Connect()
 	dbUser := PkgDb.Timer{}
 	timerDb := dbUser.Create()
 
@@ -69,11 +69,11 @@ func upCreateTimersTable(ctx context.Context, tx *sql.Tx) error {
 
 func downCreateTimersTable(ctx context.Context, tx *sql.Tx) error {
 	db := PkgDb.Db{}
-	db.Connect()
 	dbTimer := PkgDb.Timer{}
 	timerDb := dbTimer.Create()
 
 	timersTableName := timerDb.TableName
+	fmt.Print(timersTableName, "table name")
 	rows, err := db.Db.Query("SHOW TABLES LIKE %s;", timersTableName)
 
 	if err != nil {
@@ -101,6 +101,5 @@ func downCreateTimersTable(ctx context.Context, tx *sql.Tx) error {
 		tx.Commit()
 	}
 
-	return nil
 	return nil
 }

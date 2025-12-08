@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"log"
 	PkgDb "shadowflade/timers/pkg/db"
 
@@ -14,24 +15,19 @@ func init() {
 }
 
 func upCreateUsersTable(ctx context.Context, tx *sql.Tx) error {
-	db := PkgDb.Db{}
-	db.Connect()
 	dbUser := PkgDb.User{}
 	userDB := dbUser.Create()
 
 	userTable := userDB.TableName
-	rows, err := db.Db.Query("SHOW TABLES LIKE %s;", userTable)
+	var isUsersTableExists bool
+	err := tx.QueryRow(fmt.Sprintf("SHOW TABLES LIKE '%s';", userTable)).Scan(&isUsersTableExists)
 
-	if err != nil {
-		log.Panic(err.Error())
-	}
-
-	if !rows.Next() {
+	if err == nil {
+		fmt.Printf("Table users already exists")
 		return nil
 	}
 
-	query := `
-	CREATE TABLE users (
+	query := fmt.Sprintf(`CREATE TABLE %s (
 		id INT NOT NULL AUTO_INCREMENT,
 		uuid CHAR(36) NOT NULL DEFAULT (UUID()),
 		name VARCHAR(255) NULL,
@@ -42,9 +38,10 @@ func upCreateUsersTable(ctx context.Context, tx *sql.Tx) error {
 		PRIMARY KEY (id),
 		UNIQUE KEY uq_uuid (uuid)
 	)
-	`
+	`, userTable)
+	fmt.Print(query + "\n")
 
-	res, err := db.Db.NamedExec(query, userTable)
+	res, err := tx.Exec(query)
 
 	if err != nil {
 		tx.Rollback()
@@ -67,7 +64,6 @@ func upCreateUsersTable(ctx context.Context, tx *sql.Tx) error {
 
 func downCreateUsersTable(ctx context.Context, tx *sql.Tx) error {
 	db := PkgDb.Db{}
-	db.Connect()
 	dbUser := PkgDb.User{}
 	userDB := dbUser.Create()
 
