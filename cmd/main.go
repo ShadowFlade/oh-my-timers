@@ -21,6 +21,7 @@ func main() {
 	fmt.Println("slkdjflsdkjf")
 	fmt.Println("slkdjflsdkjf")
 	fmt.Println("slkdjflsdkjf")
+	fmt.Println("slkdjflsdkjf")
 
 	mux.HandleFunc("/assets/", assetsHandler)
 
