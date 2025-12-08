@@ -68,7 +68,7 @@ func (this *Db) CreateTimer(timer interfaces.Timer) (int64, error) {
 		return 0, fmt.Errorf("failed to connect to database: %w", err)
 	}
 
-	tx, err := db.db.Beginx() //why use BeginxX and not MustBegin?
+	tx, err := db.Db.Beginx() //why use BeginxX and not MustBegin?
 	if err != nil {
 		return 0, fmt.Errorf("failed to begin transaction: %w", err)
 	}
@@ -247,7 +247,7 @@ func (this *Db) StopTimer(timerId int) (int64, error) {
 		return 0, fmt.Errorf("failed to connect to database: %w", err)
 	}
 
-	tx, err := db.db.Beginx()
+	tx, err := db.Db.Beginx()
 	if err != nil {
 		return 0, fmt.Errorf("failed to begin transaction: %w", err)
 	}
@@ -313,7 +313,7 @@ func (this *Db) AddOrUpdateTimerColor(timerId int, color string) (int64, error) 
 	if err != nil {
 		log.Fatalf("Could not connect ot database updating timer color: %s", err.Error())
 	}
-	tx, err := db.db.Beginx()
+	tx, err := db.Db.Beginx()
 	if err != nil {
 		return 0, fmt.Errorf("failed to begin transaction: %w", err)
 	}
@@ -363,7 +363,7 @@ func (this *Db) RefreshTimer(timerId int) (int64, error) {
 	if err != nil {
 		log.Fatalf("Could not connect ot database updating title: %s", err.Error())
 	}
-	tx, err := db.db.Beginx()
+	tx, err := db.Db.Beginx()
 	if err != nil {
 		return 0, fmt.Errorf("failed to begin transaction: %w", err)
 	}
