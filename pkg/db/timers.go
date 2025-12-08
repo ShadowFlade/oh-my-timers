@@ -13,6 +13,13 @@ import (
 )
 
 type Timer struct {
+	TableName string
+}
+
+func (this *Timer) Create() *Timer {
+	return &Timer{
+		TableName: "timers",
+	}
 }
 
 func (this *Timer) GetAllUsersTimers(userID int) []interfaces.Timer {
@@ -21,14 +28,11 @@ func (this *Timer) GetAllUsersTimers(userID int) []interfaces.Timer {
 	if err != nil {
 		panic(err.Error())
 	}
-	tx := db.db.MustBegin()
+	tx := db.Db.MustBegin()
 
 	userId := strconv.Itoa(userID)
 	fmt.Println(userID)
-	res, err := db.db.Queryx(fmt.Sprintf(
-		"select * from timers where user_id = %s order by start",
-		userId,
-	))
+	res, err := db.Db.Queryx(fmt.Sprintf("select * from timers where user_id = %s order by start", userId))
 
 	if err != nil {
 		panic(err.Error())
@@ -118,7 +122,7 @@ func (this *Db) StartTimer(timerId int, startTime int64) (int64, error) {
 	}
 	sTime := time.Unix(startTime, 0)
 	query := `update timers set running_since = ?, date_modified = ? where id = ?;`
-	tx, err := db.db.Beginx()
+	tx, err := db.Db.Beginx()
 	if err != nil {
 		return 0, fmt.Errorf("failed to begin transaction: %w", err)
 	}
@@ -176,7 +180,13 @@ func (this *Db) PauseTimer(timerId int, pauseTime int64) (int64, error) {
 	// Calculate elapsed time
 	elapsedSeconds := int(time.Since(start).Seconds())
 	newDuration := userTimer.Duration + int64(elapsedSeconds)
-	fmt.Printf("elapsed: #%s, \nnewDuratino: %s, \nrunning since: %s, \nnow: %s", elapsedSeconds, newDuration, userTimer.RunningSince.Time, time.Now())
+	fmt.Printf(
+		"elapsed: #%d, \nnewDuratino: %d, \nrunning since: %s, \nnow: %s",
+		elapsedSeconds,
+		newDuration,
+		userTimer.RunningSince.Time,
+		time.Now(),
+	)
 
 	newPausedAt := time.Now()
 
@@ -187,7 +197,7 @@ func (this *Db) PauseTimer(timerId int, pauseTime int64) (int64, error) {
 		SET duration = ?, paused_at = ?, running_since = null, date_modified = ?
 		WHERE id = ?`
 
-	tx, err := db.db.Beginx()
+	tx, err := db.Db.Beginx()
 	if err != nil {
 		return 0, fmt.Errorf("failed to begin transaction: %w", err)
 	}
@@ -206,11 +216,19 @@ func (this *Db) PauseTimer(timerId int, pauseTime int64) (int64, error) {
 		timerId,
 	)
 	if err != nil {
-		log.Panicf("Query: %s \n failed to update timer: %w.\nDuration: %s,\nuserTimer.Duration: %s,\n elapsedSeconds: %s.\n Timer id : %s", updateTimerDurationQuery, err, newDuration, userTimer.Duration, elapsedSeconds, userTimer.Id)
+		log.Panicf(
+			"Query: %s \n failed to update timer: %s.\nDuration: %d,\nuserTimer.Duration: %d,\n elapsedSeconds: %d.\n Timer id : %d",
+			updateTimerDurationQuery,
+			err.Error(),
+			newDuration,
+			userTimer.Duration,
+			elapsedSeconds,
+			userTimer.Id,
+		)
 	}
 
 	if err := tx.Commit(); err != nil {
-		log.Panicf("failed to commit: %w", err)
+		log.Panicf("%s", err.Error())
 	}
 	tx = nil // prevent rollback
 
@@ -266,7 +284,7 @@ func (this *Db) StopTimer(timerId int) (int64, error) {
 func (this *Db) GetTimerById(timerId int) interfaces.Timer {
 	db := Db{}
 	err := db.Connect()
-	res, err := db.db.Queryx(
+	res, err := db.Db.Queryx(
 		fmt.Sprintf("select * from timers where id = %d;", int(timerId)),
 	)
 
@@ -321,7 +339,7 @@ func (this *Db) UpdateTitle(title string, timerId int) (int64, error) {
 	if err != nil {
 		log.Fatalf("Could not connect ot database updating title: %s", err.Error())
 	}
-	tx, err := db.db.Beginx()
+	tx, err := db.Db.Beginx()
 	if err != nil {
 		return 0, fmt.Errorf("failed to begin transaction: %w", err)
 	}
@@ -372,7 +390,7 @@ func (this *Db) DeleteTimer(timerId int64) (int, error) {
 	if err != nil {
 		log.Fatalf("Could not connect ot database updating title: %s", err.Error())
 	}
-	tx, err := db.db.Beginx()
+	tx, err := db.Db.Beginx()
 	if err != nil {
 		return 0, fmt.Errorf("failed to begin transaction: %w", err)
 	}
@@ -386,7 +404,11 @@ func (this *Db) DeleteTimer(timerId int64) (int, error) {
 
 	result, err := tx.Exec(deleteTimerQuery, timerId)
 	if err != nil {
-		log.Fatalln("Could not delete timer with id: %d. Error: %s", timerId, err.Error())
+		log.Fatalf(
+			"Could not delete timer with id: %d. Error: %s",
+			timerId,
+			err.Error(),
+		)
 	}
 	rowsAffected, err := result.RowsAffected()
 	tx.Commit()

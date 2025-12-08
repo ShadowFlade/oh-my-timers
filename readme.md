@@ -1,3 +1,7 @@
+# DISCLAIMER
+
+This code style is disapproved by golang community and myself (i just love `this`)
+
 ### Start project
 `air`
 
@@ -6,9 +10,6 @@
 * ~~update title~~
 * ~~разобраться почему при перезагрузке страницы показывает таймер запускающийся заново каждый раз~~
 * ~~сделать чтобы при удалении таймеры не сразу меняли положение, а было как в firefox - спустя 1.5 секунды~~ (такой херней заниматься нет желания - не сделано)
-* add report button in dev mode (priority#3)
+* add report button in dev mode
 * добавить выбор цвета?
-* ~~add active (running timer) color (priority#1)~~
-* ~~передвинуть кнопку рефреш чтобы она показывалась по центру круга таймера при наведении на таймер~~
-* сделать класс с requests (#refactoring)
-* внедрить миграции
+* добавить в миграции поддержку sqlite

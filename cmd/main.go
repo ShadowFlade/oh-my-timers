@@ -18,7 +18,7 @@ func main() {
 	timerHandler := handlers.TimerHandler{}
 
 	mux := http.NewServeMux()
-	mux.Handle("/assets/", http.HandlerFunc(assetsHandler))
+	mux.HandleFunc("/assets/", assetsHandler)
 	mux.HandleFunc("/createTimer", timerHandler.CreateTimer)
 	mux.HandleFunc("/pauseTimer", timerHandler.PauseTimer)
 	mux.HandleFunc("/stopTimer", timerHandler.StopTimer)
