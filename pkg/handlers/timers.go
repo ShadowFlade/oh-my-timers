@@ -163,8 +163,10 @@ func (this *TimerHandler) StopTimer(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("TEST")
 	timerId, _ = strconv.Atoi(timerId.(string))
 
-	newDuration, _ := db.StopTimer(timerId.(int))
-	w.Write([]byte(string(newDuration)))
+	rowsAffected, _ := db.StopTimer(timerId.(int))
+
+	w.Header().Set("Content-Type", "text/plain")
+	w.Write([]byte(fmt.Sprint(rowsAffected)))
 
 }
 
@@ -185,6 +187,33 @@ func (this *TimerHandler) UpdateTimerTitle(w http.ResponseWriter, r *http.Reques
 	affectedId, err := db.UpdateTitle(newTitle, timerId)
 	if err != nil {
 		log.Panicf("Could not update timer title. Title: %s. Error: %s", newTitle, err.Error())
+	}
+	resp := interfaces.JsonResponse{
+		IsSuccess: true,
+		Data:      affectedId,
+		Error:     "",
+	}
+
+	w.Write([]byte(resp.String()))
+}
+
+func (this *TimerHandler) AddUpdateTimerColor(w http.ResponseWriter, r *http.Request) {
+	db := db.Db{}
+	reqBody, _ := io.ReadAll(r.Body)
+	var body map[string]interface{}
+	json.Unmarshal(reqBody, &body)
+	color := body["color"].(string)
+	timerId, err := strconv.Atoi(body["id"].(string))
+	if err != nil {
+		panic(err)
+	}
+	if color == "" || timerId == 0 {
+		return
+	}
+
+	affectedId, err := db.AddOrUpdateTimerColor(timerId, color)
+	if err != nil {
+		log.Panicf("Could not update timer title. Color: %s. Error: %s", color, err.Error())
 	}
 	resp := interfaces.JsonResponse{
 		IsSuccess: true,

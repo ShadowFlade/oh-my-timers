@@ -25,7 +25,10 @@ func (this *Timer) GetAllUsersTimers(userID int) []interfaces.Timer {
 
 	userId := strconv.Itoa(userID)
 	fmt.Println(userID)
-	res, err := db.db.Queryx(fmt.Sprintf("select * from timers where user_id = %s order by start", userId))
+	res, err := db.db.Queryx(fmt.Sprintf(
+		"select * from timers where user_id = %s order by start",
+		userId,
+	))
 
 	if err != nil {
 		panic(err.Error())
@@ -284,6 +287,32 @@ func (this *Db) GetTimerById(timerId int) interfaces.Timer {
 
 	return userTimer
 
+}
+
+func (this *Db) AddOrUpdateTimerColor(timerId int, color string) (int64, error) {
+	db := Db{}
+	err := db.Connect()
+	if err != nil {
+		log.Fatalf("Could not connect ot database updating timer color: %s", err.Error())
+	}
+	tx, err := db.db.Beginx()
+	if err != nil {
+		return 0, fmt.Errorf("failed to begin transaction: %w", err)
+	}
+	defer func() {
+		if tx != nil {
+			tx.Rollback()
+		}
+	}()
+
+	updateTitleQuery := `insert into timers (id, color) values (?,?) on duplicate key update color = ?;`
+
+	result, err := tx.Exec(updateTitleQuery, timerId, color, color)
+	rowsAffected, _ := result.RowsAffected()
+
+	tx = nil
+
+	return rowsAffected, nil
 }
 
 func (this *Db) UpdateTitle(title string, timerId int) (int64, error) {

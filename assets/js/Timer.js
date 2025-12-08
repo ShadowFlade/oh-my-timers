@@ -12,6 +12,10 @@ class Timer {
 		if (this.isRunning) {
 			this.startUpdatingDisplay();
 		}
+		this.cssClasses = {
+			timerCircleRunning:"timer-circle--active",
+			timerCircleStaleUserCustom:"timer-circle--user-stale"
+		}
 	}
 
 	/**
@@ -19,6 +23,7 @@ class Timer {
 	 * @param {HTMLElement} dataContainer
 	 */
 	setupState(dataContainer) {
+		this.timerCircle = this.timerContainer.querySelector('.js-timer-circle')
 		this.timerDisplay = this.timerContainer.querySelector('.js-timer-display');
 		this.startBtn = this.timerContainer.querySelector('.js-start-btn');
 		this.pauseBtn = this.timerContainer.querySelector('.js-pause-btn');
@@ -27,6 +32,7 @@ class Timer {
 		this.deleteBtn = this.timerContainer.querySelector('.js-delete-btn');
 		this.titleInput = this.timerContainer.querySelector('.js-timer-title')
 		this.refreshButton = this.timerContainer.querySelector('.js-refresh-btn')
+		this.colorPicker = this.timerContainer.querySelector('.js-timer-color-picker')
 
 		this.id = +dataContainer.dataset['id'];
 		this.seconds = +dataContainer.dataset['duration'];
@@ -44,6 +50,24 @@ class Timer {
 		this.form.addEventListener('submit', (e) => this.handleSubmit(e));
 		this.deleteBtn.addEventListener('click', (e) => this.delete(e));
 		this.titleInput.addEventListener('blur', (e) => this.handleTimerTitleChange(e))
+		this.colorPicker.addEventListener('change', this.handleTimerColorChange.bind(this))
+	}
+	/**
+	 * 
+	 * @param {Event} e 
+	 */
+	handleTimerColorChange(e) {
+		const newColor = e.currentTarget.value;
+		console.log(e.currentTarget,' cur target');
+		this.timerCircle.style.borderColor = newColor;
+		const timerId = this.timerContainer.dataset.id;
+		fetch(window.updateTimerColor, {
+			body:JSON.stringify({color: newColor, id: timerId}),
+			method:"POST",
+			headers: {
+				'Content-Type': 'application/json',
+			}
+		})
 	}
 
 	async handleTimerTitleChange(e) {
@@ -78,6 +102,7 @@ class Timer {
 		});
 		const data = await resp.json();
 		this.startUpdatingDisplay();
+		this.updateCssClasses();
 	}
 
 	initTime() {
@@ -148,8 +173,8 @@ class Timer {
 			body: JSON.stringify({ userId, timer_id, stop_time }),
 		});
 		const data = await resp.json();
+		this.updateCssClasses();
 		console.log(data,' data');
-
 	}
 
 
@@ -161,8 +186,8 @@ class Timer {
 		
 
 		this.updatingDisplayInterval = setInterval(() => {
-			this.seconds++;
 			this.updateDisplay();
+			this.seconds++;
 		}, 1000);
 	}
 
@@ -206,5 +231,25 @@ class Timer {
 		if (this.isRunning) {
 			this.pause();
 		}
+	}
+
+	updateCssClasses() {
+		const circleRunningClass = this.cssClasses.timerCircleRunning
+		
+		if (
+			this.isRunning 
+			&& !this.timerCircle.classList.contains(circleRunningClass)
+		) {
+			this.timerCircle.classList.add(circleRunningClass)
+		}
+		console.log(this.timerCircle, ' timer circle', this.isRunning);
+
+		if (
+			!this.isRunning
+			&& this.timerCircle.classList.contains(circleRunningClass)
+		) {
+			console.log('removing');
+				this.timerCircle.classList.remove(circleRunningClass)
+			}
 	}
 }

@@ -26,6 +26,7 @@ func main() {
 	mux.HandleFunc("/deleteTimer", timerHandler.DeleteTimer)
 	mux.HandleFunc("/createUser", timerHandler.CreateUser)
 	mux.HandleFunc("/updateTimerTittle", timerHandler.UpdateTimerTitle)
+	mux.HandleFunc("/updateTimerColor", timerHandler.AddUpdateTimerColor)
 	mux.HandleFunc("/", timerHandler.RenderUserTimers)
 
 	log.Fatal(http.ListenAndServe(":"+global.PORT, mux))
