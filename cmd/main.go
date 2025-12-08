@@ -20,6 +20,7 @@ func main() {
 	mux := http.NewServeMux()
 	fmt.Println("slkdjflsdkjf")
 	fmt.Println("slkdjflsdkjf")
+	fmt.Println("slkdjflsdkjf")
 
 	mux.HandleFunc("/assets/", assetsHandler)
 
