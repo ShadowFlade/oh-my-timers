@@ -48,7 +48,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           source: "main"         
-          target: "/home/projects/oh-my-timers/main"
+          target: "/home/projects/oh-my-timers/"
       
       - name : Deploy
         uses: appleboy/ssh-action@master
