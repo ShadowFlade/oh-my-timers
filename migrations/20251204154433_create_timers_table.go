@@ -66,34 +66,40 @@ func upCreateTimersTable(ctx context.Context, tx *sql.Tx) error {
 }
 
 func downCreateTimersTable(ctx context.Context, tx *sql.Tx) error {
-	db := PkgDb.Db{}
 	dbTimer := PkgDb.Timer{}
 	timerDb := dbTimer.Create()
 
 	timersTableName := timerDb.TableName
 	fmt.Print(timersTableName, "table name")
-	rows, err := db.Db.Query("SHOW TABLES LIKE %s;", timersTableName)
 
-	if err != nil {
-		log.Panic(err.Error())
-	}
-
-	if !rows.Next() {
-		return nil
-	}
-
-	query := `
-	drop table if exists %s
-	`
-
-	res, err := db.Db.NamedExec(query, timersTableName)
+	rows, err := tx.Exec(
+		"SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = ?;",
+		timersTableName,
+	)
 
 	if err != nil {
 		tx.Rollback()
 		log.Panic(err.Error())
 	}
 
-	rowsAffected, err := res.RowsAffected()
+	rowsAffected, _ := rows.RowsAffected()
+
+	if rowsAffected == 0 {
+		return nil
+	}
+
+	query := `
+	drop table if exists ?;
+	`
+
+	res, err := tx.Exec(query, timersTableName)
+
+	if err != nil {
+		tx.Rollback()
+		log.Panic(err.Error())
+	}
+
+	rowsAffected, _ = res.RowsAffected()
 
 	if rowsAffected > 0 {
 		tx.Commit()
