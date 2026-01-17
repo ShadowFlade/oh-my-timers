@@ -63,12 +63,11 @@ func upCreateUsersTable(ctx context.Context, tx *sql.Tx) error {
 }
 
 func downCreateUsersTable(ctx context.Context, tx *sql.Tx) error {
-	db := PkgDb.Db{}
 	dbUser := PkgDb.User{}
 	userDB := dbUser.Create()
 
 	userTable := userDB.TableName
-	rows, err := db.Db.Query("SHOW TABLES LIKE %s;", userTable)
+	rows, err := tx.Query(fmt.Sprintf("SHOW TABLES LIKE '%s';", userTable))
 
 	if err != nil {
 		log.Panic(err.Error())
@@ -79,10 +78,10 @@ func downCreateUsersTable(ctx context.Context, tx *sql.Tx) error {
 	}
 
 	query := `
-	drop table if exists %s
+	drop table if exists '?';
 	`
 
-	res, err := db.Db.NamedExec(query, userTable)
+	res, err := tx.Exec(query, userTable)
 
 	if err != nil {
 		tx.Rollback()
