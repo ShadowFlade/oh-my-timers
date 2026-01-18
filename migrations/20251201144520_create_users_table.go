@@ -67,7 +67,7 @@ func downCreateUsersTable(ctx context.Context, tx *sql.Tx) error {
 	userDB := dbUser.Create()
 
 	userTable := userDB.TableName
-	rows, err := tx.Query(fmt.Sprintf("SHOW TABLES LIKE '%s';", userTable))
+	rows, err := tx.Query(fmt.Sprintf("SHOW TABLES LIKE '%s';"), userTable)
 
 	if err != nil {
 		log.Panic(err.Error())

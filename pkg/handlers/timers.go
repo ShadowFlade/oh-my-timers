@@ -177,6 +177,9 @@ func (this *TimerHandler) StopTimer(w http.ResponseWriter, r *http.Request) {
 
 func (this *TimerHandler) UpdateTimerTitle(w http.ResponseWriter, r *http.Request) {
 	db := db.Db{}
+	db.Connect()
+	defer db.Db.Close()
+	fmt.Println("hey ya")
 	reqBody, _ := io.ReadAll(r.Body)
 	var body map[string]interface{}
 	json.Unmarshal(reqBody, &body)
@@ -193,6 +196,8 @@ func (this *TimerHandler) UpdateTimerTitle(w http.ResponseWriter, r *http.Reques
 	if err != nil {
 		log.Panicf("Could not update timer title. Title: %s. Error: %s", newTitle, err.Error())
 	}
+	w.Header().Set("Content-Type", "application/json")
+
 	resp := interfaces.JsonResponse{
 		IsSuccess: true,
 		Data:      affectedId,
@@ -279,6 +284,8 @@ func (this *TimerHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
 	var response map[string]string
 	json.Unmarshal(body, &response)
 	password := response["password"]
+	logger := global.Logger
+	logger.LogText(fmt.Sprintf("password %s", password), "")
 
 	if password == "" {
 		resp, _ := json.Marshal(map[string]interface{}{
@@ -290,14 +297,27 @@ func (this *TimerHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
 
 	userService := services.User{}
 	hashedPassword, _ := userService.HashPassword(password)
+	logger.LogText(fmt.Sprintf("hashed password %s", hashedPassword), "")
 
 	userDb := DB.User{}
-	user := interfaces.NewUser("USER", hashedPassword)
-	newUserID := userDb.CreateUser(user)
+	var user interfaces.User
+	var userId int64
+
+	if userTemp, hashErr := userDb.FindUserByHashedPassword(hashedPassword); hashErr == nil {
+		user = *userTemp
+		logger.LogText("Found user: "+userTemp.Name, "")
+		userId = user.Id
+	} else {
+		log.Println("Custom error: " + hashErr.Error())
+		user = interfaces.NewUser("USER", hashedPassword)
+		userId = userDb.CreateUser(user)
+	}
+
+	fmt.Println(fmt.Sprint(userId) + ": user id")
 	maxAge := 3600 * 24 * 7 * 52
 	cookie := &http.Cookie{
 		Name:     "user_id",
-		Value:    strconv.Itoa(int(newUserID)),
+		Value:    strconv.Itoa(int(userId)),
 		Path:     "/",
 		MaxAge:   maxAge,
 		HttpOnly: true,
@@ -321,7 +341,7 @@ func (this *TimerHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Credentials", "true")
 	w.Header().Set("Content-Type", "application/json")
 	newUserResp, _ := json.Marshal(map[string]interface{}{
-		"newUserId": newUserID,
+		"newUserId": userId,
 		"isSuccess": true,
 	})
 	w.Write(newUserResp)

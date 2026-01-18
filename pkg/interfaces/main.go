@@ -53,10 +53,12 @@ func NewTimer(userId int32, title string, color string) Timer {
 }
 
 type User struct {
-	id       int64  `db:"id"`
-	Name     string `db:"name"`
-	uuid     string `db:"uuid"`
-	Password string `db:"password"`
+	Id           int64     `db:"id"`
+	Name         string    `db:"name"`
+	Uuid         string    `db:"uuid"`
+	Password     string    `db:"password"`
+	DateInserted time.Time `db:"date_inserted"`
+	DateModified time.Time `db:"date_modified"`
 }
 
 func NewUser(name string, password string) User {
