@@ -8,13 +8,14 @@ import (
 )
 
 type Db struct {
-	Db          *sqlx.DB
-	dbName      string
-	dbHost      string
-	login       string
-	password    string
-	UsersTable  string
-	TimersTable string
+	Db               *sqlx.DB
+	dbName           string
+	dbHost           string
+	login            string
+	password         string
+	UsersTable       string
+	TimersTable      string
+	ConnectionsCount int
 }
 
 func (this *Db) Connect() error {
@@ -36,6 +37,8 @@ func (this *Db) Connect() error {
 	if err != nil {
 		return err
 	}
+	this.ConnectionsCount++
+	fmt.Println(this.ConnectionsCount, "DB CONNECTIONS")
 
 	this.Db = db
 

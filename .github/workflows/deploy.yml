@@ -61,7 +61,6 @@ jobs:
             echo "[$(date)] Начало билда" >> /var/log/deploy.log
             {
               echo "Продолжение билда"
-              # Добавьте ваши команды деплоя здесь
               cd /home/projects/oh-my-timers
               sudo systemctl restart oh-my-timers
             } 2>&1 | tee -a /var/log/deploy.log

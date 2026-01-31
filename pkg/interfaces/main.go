@@ -8,6 +8,7 @@ import (
 	"time"
 )
 
+// вроде бы я вынес их сюда чтобы не брать из package db и не было кругового импорта (с круговым импортом go не дает скомплиться)
 type Timer struct {
 	DateInserted      sql.NullTime `db:"date_inserted"`
 	DateModified      sql.NullTime `db:"date_modified"`
@@ -80,4 +81,18 @@ func (this *JsonResponse) String() string {
 	}
 
 	return string(jsonBytes)
+}
+
+type TimerCategory struct {
+	id    int64  `db:"id"`
+	Name  string `db:"name"`
+	Color string `db:"color"`
+}
+
+func (this *TimerCategory) New(name string, color string) *TimerCategory {
+	timerCategory := &TimerCategory{}
+	timerCategory.Name = name
+	timerCategory.Color = color
+
+	return timerCategory
 }
