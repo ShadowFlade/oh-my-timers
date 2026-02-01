@@ -129,18 +129,6 @@ func (this *TimerHandler) PauseTimer(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Println("TEST11")
-	fmt.Println("TEST10")
-	fmt.Println("TEST9")
-
-	fmt.Println("TEST8")
-	fmt.Println("TEST7")
-	fmt.Println("TEST6")
-	fmt.Println("TEST5")
-	fmt.Println("TEST4")
-	fmt.Println("TEST3")
-	fmt.Println("TEST2")
-	fmt.Println("TEST")
 	timerId, _ = strconv.Atoi(timerId.(string))
 
 	newDuration, _ := db.PauseTimer(timerId.(int), int64(pauseTime.(float64)))
@@ -159,13 +147,6 @@ func (this *TimerHandler) StopTimer(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Println("TEST7")
-	fmt.Println("TEST6")
-	fmt.Println("TEST5")
-	fmt.Println("TEST4")
-	fmt.Println("TEST3")
-	fmt.Println("TEST2")
-	fmt.Println("TEST")
 	timerId, _ = strconv.Atoi(timerId.(string))
 
 	rowsAffected, _ := db.StopTimer(timerId.(int))
@@ -179,7 +160,6 @@ func (this *TimerHandler) UpdateTimerTitle(w http.ResponseWriter, r *http.Reques
 	db := db.Db{}
 	db.Connect()
 	defer db.Db.Close()
-	fmt.Println("hey ya")
 	reqBody, _ := io.ReadAll(r.Body)
 	var body map[string]interface{}
 	json.Unmarshal(reqBody, &body)
@@ -243,7 +223,6 @@ func (this *TimerHandler) DeleteTimer(w http.ResponseWriter, r *http.Request) {
 	if timerId == 0 {
 		log.Panicf("Timer id is 0 from json body: %s", string(reqBody))
 	}
-	fmt.Println(timerId, "timer id to delete", string(reqBody))
 	rowsAffected, _ := db.DeleteTimer(int64(timerId))
 	jsonResponse := interfaces.JsonResponse{IsSuccess: rowsAffected > 0, Data: rowsAffected, Error: ""}
 	w.Write([]byte(jsonResponse.String()))
@@ -313,7 +292,6 @@ func (this *TimerHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
 		userId = userDb.CreateUser(user)
 	}
 
-	fmt.Println(fmt.Sprint(userId) + ": user id")
 	maxAge := 3600 * 24 * 7 * 52
 	cookie := &http.Cookie{
 		Name:     "user_id",

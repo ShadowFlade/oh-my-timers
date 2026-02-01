@@ -31,7 +31,6 @@ func (this *Timer) GetAllUsersTimers(userID int) []interfaces.Timer {
 	tx := db.Db.MustBegin()
 
 	userId := strconv.Itoa(userID)
-	fmt.Println(userID)
 	res, err := db.Db.Queryx(fmt.Sprintf("select * from timers where user_id = %s order by start", userId))
 
 	if err != nil {
@@ -171,10 +170,8 @@ func (this *Db) PauseTimer(timerId int, pauseTime int64) (int64, error) {
 
 	if userTimer.RunningSince.Valid {
 		start = userTimer.RunningSince.Time
-		fmt.Println("Using running since")
 	} else if !userTimer.StartTime.IsZero() {
 		start = userTimer.StartTime
-		fmt.Println("Start time is not zero")
 	} else {
 		log.Panicln("You fucked up with time bro")
 	}
@@ -189,8 +186,6 @@ func (this *Db) PauseTimer(timerId int, pauseTime int64) (int64, error) {
 		userTimer.RunningSince.Time,
 		time.Now(),
 	)
-
-	newPausedAt := time.Now()
 
 	now := time.Now()
 	pausedAt := time.Unix(pauseTime/1000, 0) //TODO[check]:int64 делится на 1000 ?
@@ -209,7 +204,6 @@ func (this *Db) PauseTimer(timerId int, pauseTime int64) (int64, error) {
 		}
 	}()
 
-	fmt.Println(newDuration, newPausedAt, now, now, timerId)
 	result, err := tx.Exec(
 		updateTimerDurationQuery,
 		newDuration,

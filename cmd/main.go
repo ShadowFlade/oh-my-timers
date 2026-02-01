@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"path/filepath"
@@ -43,7 +42,6 @@ func init() {
 
 func assetsHandler(w http.ResponseWriter, r *http.Request) {
 	if err := env.Load("./.env"); err != nil {
-		fmt.Println("error")
 		panic(err)
 	}
 
