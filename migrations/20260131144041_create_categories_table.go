@@ -23,7 +23,7 @@ func upCreateCategoriesTable(ctx context.Context, tx *sql.Tx) error {
 	log.Println(isTableAlreadyExists)
 	panic("haha")
 
-	query := fmt.Sprintf("create table %s (id int not null auto_increment primary key, name varchar(100) not null, color varchar(100) not null default 'red')", timerCategoryModel.TableName)
+	// query := fmt.Sprintf("create table %s (id int not null auto_increment primary key, name varchar(100) not null, color varchar(100) not null default 'red')", timerCategoryModel.TableName)
 
 	return nil
 }

@@ -28,7 +28,6 @@ func main() {
 	args := flags.Args()
 
 	curDir, err := os.Getwd()
-	fmt.Println("Current working directory:", curDir)
 
 	log.Print(args)
 
@@ -42,7 +41,6 @@ func main() {
 	fmt.Println(curDir, " CURRENT DIRECOTRY")
 
 	if err := env.Load(curDir); err != nil {
-		fmt.Println("error")
 		panic(err)
 	}
 	dbstring := env.Get("GOOSE_DBSTRING", "")

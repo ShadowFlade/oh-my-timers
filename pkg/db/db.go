@@ -20,7 +20,6 @@ type Db struct {
 
 func (this *Db) Connect() error {
 	if err := env.Load("./.env"); err != nil {
-		fmt.Println("error")
 		panic(err)
 	}
 

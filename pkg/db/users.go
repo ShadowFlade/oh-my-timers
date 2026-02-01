@@ -34,7 +34,6 @@ func (this *User) CreateUser(user interfaces.User) int64 {
 		log.Fatalf("Error on creating user. Query: %s. Err: %s", query, err.Error())
 	}
 	newId, err := res.LastInsertId()
-	fmt.Println("new id: " + fmt.Sprint(newId))
 	if err != nil {
 		panic(err.Error())
 	}

@@ -58,7 +58,6 @@ class Timer {
 	 */
 	handleTimerColorChange(e) {
 		const newColor = e.currentTarget.value;
-		console.log(e.currentTarget,' cur target');
 		this.timerCircle.style.borderColor = newColor;
 		const timerId = this.timerContainer.dataset.id;
 		fetch(window.updateTimerColor, {
@@ -86,11 +85,11 @@ class Timer {
 		})
 	}
 
-	async start() {
+	start() {
 		if (!this.isRunning) {
 			this.isRunning = true;
 		}
-		const resp = await fetch(window.startTimer, {
+		fetch(window.startTimer, {
 			body: JSON.stringify({
 				timer_id: this.timerContainer.dataset.id,
 				start_time: Date.now() / 1000,
@@ -100,7 +99,6 @@ class Timer {
 				'Content-Type': 'application/json',
 			},
 		});
-		const data = await resp.json();
 		this.startUpdatingDisplay();
 		this.updateCssClasses();
 	}
@@ -113,10 +111,8 @@ class Timer {
 		const runningSinceDate = new Date(runningSince);
 		const runningSinceTime = runningSinceDate.getTime()
 		const now = Date.now();
-		console.log({now,runningSinceDate,runningSinceTime})
 		const seconds = Math.round((now - runningSinceTime) / 1000);
 		this.seconds = seconds;
-		console.log(this.timerContainer.dataset.runningSince, 'running since', seconds, 'seconds');
 	}
 
 	pause() {
@@ -149,7 +145,7 @@ class Timer {
 	/**
 	 * Сбрасывает время и останавливает таймер
 	 */
-	async stop() {
+	stop() {
 		const stop_time = Date.now()
 		this.seconds = 0;
 		this.updateDisplay();
@@ -165,16 +161,14 @@ class Timer {
 			alert('Не удалось определить ID юзера или таймера');
 			return;
 		}
-		const resp = await fetch(window.stopTimer, {
+		fetch(window.stopTimer, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
 			},
 			body: JSON.stringify({ userId, timer_id, stop_time }),
 		});
-		const data = await resp.json();
 		this.updateCssClasses();
-		console.log(data,' data');
 	}
 
 
@@ -242,13 +236,11 @@ class Timer {
 		) {
 			this.timerCircle.classList.add(circleRunningClass)
 		}
-		console.log(this.timerCircle, ' timer circle', this.isRunning);
 
 		if (
 			!this.isRunning
 			&& this.timerCircle.classList.contains(circleRunningClass)
 		) {
-			console.log('removing');
 				this.timerCircle.classList.remove(circleRunningClass)
 			}
 	}
