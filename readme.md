@@ -17,4 +17,9 @@ This code style is disapproved by golang community and myself (i just love `this
 * добавить в миграции поддержку sqlite - ?
 
 
-* add commit timer time to categories - they will sum up and reset timer (and start timer if it was active at the moment) - branch categories
+### fixes
+* when starting (clicking start) timer with high latency (vpn) it does not start the timer untill the request finishes - NEED TO FIX
+
+
+* add commit timer time to categories - they will sum up and reset timer (and start timer if it was active at the moment) - branch categories - actually, not sure if i wanna do it
+* b24 integration - add side menu for entering b24hook url which will be saved into cookies -add button "load tasks" which will fetch your active tasks (assigned to you? - so also should save to cookies your id or smth) and make timers out of it
