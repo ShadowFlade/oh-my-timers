@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"path/filepath"
@@ -59,6 +60,10 @@ func assetsHandler(w http.ResponseWriter, r *http.Request) {
 
 	ext := strings.ToLower(filepath.Ext(path))
 	switch ext {
+	case ".gz":
+		w.Header().Set("Content-Encoding", "gzip")
+		http.ServeFile(w, r, path+".gz")
+		fmt.Println(path)
 	case ".css":
 		w.Header().Set("Content-Type", "text/css; charset=utf-8")
 	case ".js":
