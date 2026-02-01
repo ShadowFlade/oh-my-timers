@@ -1,8 +1,11 @@
 package services
 
 import (
-	"fmt"
+	"crypto/hmac"
+	"crypto/sha256"
+	"encoding/hex"
 
+	"github.com/gofor-little/env"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -10,13 +13,12 @@ type User struct {
 }
 
 func (this *User) HashPassword(password string) (string, error) {
-	hashedBytes, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 
-	if err != nil {
-		return "", fmt.Errorf("failed to hash password: %w", err)
-	}
+	pepper := env.Get("HASH_KEY", "default")
+	h := hmac.New(sha256.New, []byte(pepper))
+	h.Write([]byte(password))
 
-	return string(hashedBytes), nil
+	return hex.EncodeToString(h.Sum(nil)), nil
 }
 
 func (this *User) VerifyPassword(hashedPassword, password string) error {

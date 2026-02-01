@@ -56,6 +56,8 @@ func (this *Timer) GetAllUsersTimers(userID int) []interfaces.Timer {
 
 		userTimers = append(userTimers, userTimer)
 	}
+	// fmt.Printf("User timers: %v\n", userTimers)
+
 	tx.Commit()
 
 	return userTimers
@@ -351,6 +353,12 @@ func (this *Db) UpdateTitle(title string, timerId int) (int64, error) {
 	updateTitleQuery := `update timers set title = ? where id = ?;`
 	result, err := tx.Exec(updateTitleQuery, title, timerId)
 	rowsAffected, _ := result.RowsAffected()
+	lastUpdatedId, err := result.LastInsertId()
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+	fmt.Printf("rows affected %d, id affected %d", rowsAffected, lastUpdatedId)
+	tx.Commit()
 
 	tx = nil
 

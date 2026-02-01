@@ -8,3 +8,4 @@ readme_private.md
 *.gz
 goose-custom
 migrations/migrations
+*.log
