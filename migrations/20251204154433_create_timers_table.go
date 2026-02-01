@@ -28,8 +28,7 @@ func upCreateTimersTable(ctx context.Context, tx *sql.Tx) error {
 		return nil
 	}
 
-	query := fmt.Sprintf(`
-	CREATE TABLE %s (
+	query := fmt.Sprintf(`CREATE TABLE IF NOT EXISTS %s (
 		id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
 		user_id INT DEFAULT NULL,
 		start DATETIME DEFAULT NULL,
@@ -41,8 +40,7 @@ func upCreateTimersTable(ctx context.Context, tx *sql.Tx) error {
 		running_since DATETIME DEFAULT NULL,
 		title VARCHAR(255) DEFAULT NULL,
 		color VARCHAR(255) DEFAULT NULL
-	)
-	`, timersTableName)
+	);`, timersTableName)
 
 	res, createTableError := tx.Exec(query)
 

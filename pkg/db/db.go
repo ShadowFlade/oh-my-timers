@@ -30,15 +30,14 @@ func (this *Db) Connect() error {
 	this.dbHost = env.Get("DB_HOST", "host")
 	connectStr := fmt.Sprintf("%s:%s@tcp(127.0.0.1:3306)/%s?parseTime=true&loc=UTC", this.login, this.password, this.dbName)
 	db, err := sqlx.Connect("mysql", connectStr)
-	this.UsersTable = "users"
-	this.TimersTable = "timers"
-	// 	db.Query("SET time_zone = '+03:00'")
-
 	if err != nil {
 		return err
 	}
 	this.ConnectionsCount++
 	fmt.Println(this.ConnectionsCount, "DB CONNECTIONS")
+	this.UsersTable = "users"
+	this.TimersTable = "timers"
+	// 	db.Query("SET time_zone = '+03:00'")
 
 	this.Db = db
 

@@ -12,6 +12,7 @@ import (
 
 	"shadowflade/timers/pkg/global"
 	"shadowflade/timers/pkg/handlers"
+	"shadowflade/timers/pkg/services"
 )
 
 func main() {
@@ -27,7 +28,7 @@ func main() {
 	mux.HandleFunc("/startTimer", timerHandler.StartTimer)
 	mux.HandleFunc("/deleteTimer", timerHandler.DeleteTimer)
 	mux.HandleFunc("/createUser", timerHandler.CreateUser)
-	mux.HandleFunc("/updateTimerTittle", timerHandler.UpdateTimerTitle)
+	mux.HandleFunc("/updateTimerTitle", timerHandler.UpdateTimerTitle)
 	mux.HandleFunc("/updateTimerColor", timerHandler.AddUpdateTimerColor)
 	mux.HandleFunc("/", timerHandler.RenderUserTimers)
 
@@ -37,6 +38,7 @@ func main() {
 func init() {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 	time.Local = time.UTC
+	global.Logger = services.Logger{}
 }
 
 func assetsHandler(w http.ResponseWriter, r *http.Request) {
