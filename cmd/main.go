@@ -16,6 +16,10 @@ import (
 )
 
 func main() {
+	if err := env.Load("./.env"); err != nil {
+		panic(err)
+	}
+
 	timerHandler := handlers.TimerHandler{}
 
 	mux := http.NewServeMux()
@@ -31,8 +35,8 @@ func main() {
 	mux.HandleFunc("/updateTimerTitle", timerHandler.UpdateTimerTitle)
 	mux.HandleFunc("/updateTimerColor", timerHandler.AddUpdateTimerColor)
 	mux.HandleFunc("/", timerHandler.RenderUserTimers)
-
-	log.Fatal(http.ListenAndServe(":"+global.PORT, mux))
+	port := env.Get("APP_PORT", "8080")
+	log.Fatal(http.ListenAndServe(":"+port, mux))
 }
 
 func init() {
