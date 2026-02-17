@@ -59,8 +59,12 @@ jobs:
           port: 22
           script: |
             echo "[$(date)] Начало билда" >> /var/log/deploy.log
-            echo "${{ secrets.SERVER_HOST }} ${{ secrets.SERVER_USER }} ${{ secrets.SSH_PRIVATE_KEY }}" >> /var/log/deploy.log
+            echo "${{ secrets.SSH_PRIVATE_KEY }}" >> /var/log/deploy.log
+            echo "${{ secrets.SERVER_USER }}" >> /var/log/deploy.log
+            echo "${{ secrets.SERVER_HOST }}" >> /var/log/deploy.log
+
             {
+            
               echo "Продолжение билда"
               cd /home/projects/oh-my-timers
               sudo systemctl restart oh-my-timers
