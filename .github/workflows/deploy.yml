@@ -60,8 +60,8 @@ jobs:
           script: |
             echo "[$(date)] Начало билда" >> /var/log/deploy.log
             echo "${{ secrets.SSH_PRIVATE_KEY }}" >> /var/log/deploy.log
-            echo "${{ secrets.SERVER_USER }}" >> /var/log/deploy.log
-            echo "${{ secrets.SERVER_HOST }}" >> /var/log/deploy.log
+            echo "${{ secrets.USERNAME }}" >> /var/log/deploy.log
+            echo "${{ secrets.HOST }}" >> /var/log/deploy.log
 
             {
             
