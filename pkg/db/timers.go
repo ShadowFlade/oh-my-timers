@@ -46,9 +46,12 @@ func (this *Timer) GetAllUsersTimers(userID int) []interfaces.Timer {
 		}
 		var duration int64
 		duration = 0
+
 		if userTimer.RunningSince.Valid {
-			duration = time.Now().Unix() - userTimer.RunningSince.Time.Unix()
+			fmt.Println("Time is valid", duration)
+			duration = time.Now().Unix() - userTimer.RunningSince.Time.Unix() + userTimer.Duration
 		} else {
+			fmt.Println("Time is invalid", duration)
 			duration = userTimer.Duration
 		}
 		userTimer.FormattedDuration = services.FormatTimerDuration(duration)
@@ -133,6 +136,7 @@ func (this *Db) StartTimer(timerId int, startTime int64) (int64, error) {
 			fmt.Println("Ya dolboeb")
 		}
 	}()
+
 	result, err := tx.Exec(query, sTime, sTime, timerId)
 	if err != nil {
 		log.Panic(err.Error())

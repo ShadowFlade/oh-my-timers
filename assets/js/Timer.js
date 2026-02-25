@@ -112,7 +112,7 @@ class Timer {
 		const runningSinceTime = runningSinceDate.getTime()
 		const now = Date.now();
 		const seconds = Math.round((now - runningSinceTime) / 1000);
-		this.seconds = seconds;
+		this.seconds = seconds + this.seconds;
 	}
 
 	pause() {

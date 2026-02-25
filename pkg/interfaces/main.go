@@ -48,7 +48,7 @@ func NewTimer(userId int32, title string, color string) Timer {
 
 	// fmt.Printf("%#v", timer)
 
-	formattedDuration := services.FormatTimerDuration(timer.Duration)
+	formattedDuration := services.FormatTimerDuration(timer.Duration, timer.RunningSince.Time)
 	timer.FormattedDuration = formattedDuration
 	return timer
 }
