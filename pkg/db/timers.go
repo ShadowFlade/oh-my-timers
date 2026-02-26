@@ -379,11 +379,19 @@ func (this *Db) RefreshTimer(timerId int) (int64, error) {
 		}
 	}()
 	now := time.Now()
-	refreshTimerQuery := `update timers set running_since = ?, date_modified = ?, start = ?, duration = 0, `
+	refreshTimerQuery := `update timers set running_since = ?, date_modified = ?, start = ?, duration = 0;`
 	result, err := tx.Exec(refreshTimerQuery, now, now, now)
 
-	rowsAffected, _ := result.RowsAffected()
+	if err != nil {
+		log.Fatal(err.Error())
+	}
 
+	rowsAffected, rowsErr := result.RowsAffected()
+	if rowsErr != nil {
+		log.Fatal(rowsErr.Error())
+	}
+
+	tx.Commit()
 	tx = nil
 
 	return rowsAffected, nil

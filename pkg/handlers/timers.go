@@ -224,7 +224,11 @@ func (this *TimerHandler) DeleteTimer(w http.ResponseWriter, r *http.Request) {
 		log.Panicf("Timer id is 0 from json body: %s", string(reqBody))
 	}
 	rowsAffected, _ := db.DeleteTimer(int64(timerId))
-	jsonResponse := interfaces.JsonResponse{IsSuccess: rowsAffected > 0, Data: rowsAffected, Error: ""}
+	jsonResponse := interfaces.JsonResponse{
+		IsSuccess: rowsAffected > 0,
+		Data:      rowsAffected,
+		Error:     "",
+	}
 	w.Write([]byte(jsonResponse.String()))
 
 }
@@ -239,7 +243,12 @@ func (this *TimerHandler) RefreshTimer(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		panic(err)
 	}
-	w.Write([]byte(fmt.Sprint(res)))
+	jsonResponse := interfaces.JsonResponse{
+		IsSuccess: res > 0,
+		Data:      res,
+		Error:     "",
+	}
+	w.Write([]byte(jsonResponse.String()))
 }
 
 func (this *TimerHandler) UpdateTimer(w http.ResponseWriter, r *http.Request) {

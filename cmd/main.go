@@ -34,6 +34,8 @@ func main() {
 	mux.HandleFunc("/createUser", timerHandler.CreateUser)
 	mux.HandleFunc("/updateTimerTitle", timerHandler.UpdateTimerTitle)
 	mux.HandleFunc("/updateTimerColor", timerHandler.AddUpdateTimerColor)
+	mux.HandleFunc("/refreshTimer", timerHandler.RefreshTimer)
+
 	mux.HandleFunc("/", timerHandler.RenderUserTimers)
 	port := env.Get("APP_PORT", "8080")
 	log.Fatal(http.ListenAndServe(":"+port, mux))
