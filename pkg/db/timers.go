@@ -379,8 +379,9 @@ func (this *Db) RefreshTimer(timerId int) (int64, error) {
 		}
 	}()
 	now := time.Now()
-	refreshTimerQuery := `update timers set running_since = ?, date_modified = ?, start = ?, duration = 0;`
-	result, err := tx.Exec(refreshTimerQuery, now, now, now)
+	refreshTimerQuery := `update timers set running_since = ?,
+	 date_modified = ?, start = ?, duration = 0 where id = ?;`
+	result, err := tx.Exec(refreshTimerQuery, now, now, now, timerId)
 
 	if err != nil {
 		log.Fatal(err.Error())

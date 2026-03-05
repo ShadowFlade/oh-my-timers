@@ -13,8 +13,8 @@ class Timer {
 			this.startUpdatingDisplay();
 		}
 		this.cssClasses = {
-			timerCircleRunning:"timer-circle--active",
-			timerCircleStaleUserCustom:"timer-circle--user-stale"
+			timerCircleRunning: "timer-circle--active",
+			timerCircleStaleUserCustom: "timer-circle--user-stale"
 		}
 	}
 
@@ -45,7 +45,7 @@ class Timer {
 	bindEvents() {
 		this.startBtn.addEventListener('click', () => this.start());
 		this.pauseBtn.addEventListener('click', () => this.pause());
-		this.stopBtn.addEventListener('click',() => this.stop())
+		this.stopBtn.addEventListener('click', () => this.stop())
 		this.refreshButton.addEventListener('click', () => this.refresh())
 		this.form.addEventListener('submit', (e) => this.handleSubmit(e));
 		this.deleteBtn.addEventListener('click', (e) => this.delete(e));
@@ -61,8 +61,8 @@ class Timer {
 		this.timerCircle.style.borderColor = newColor;
 		const timerId = this.timerContainer.dataset.id;
 		fetch(window.updateTimerColor, {
-			body:JSON.stringify({color: newColor, id: timerId}),
-			method:"POST",
+			body: JSON.stringify({ color: newColor, id: timerId }),
+			method: "POST",
 			headers: {
 				'Content-Type': 'application/json',
 			}
@@ -77,8 +77,8 @@ class Timer {
 			return;
 		}
 		fetch(window.updateTimerTitle, {
-			body:JSON.stringify({newTitle, id: timerId}),
-			method:"POST",
+			body: JSON.stringify({ newTitle, id: timerId }),
+			method: "POST",
 			headers: {
 				'Content-Type': 'application/json',
 			}
@@ -121,7 +121,7 @@ class Timer {
 		this.isRunning = false;
 		this.startBtn.disabled = false;
 		this.pauseBtn.disabled = true;
-	
+
 		clearInterval(this.updatingDisplayInterval);
 
 		const userId = this.timerContainer.dataset.userId;
@@ -140,6 +140,8 @@ class Timer {
 			},
 			body: JSON.stringify({ userId, timer_id, pause_time }),
 		});
+		this.updateCssClasses();
+
 	}
 
 	/**
@@ -177,7 +179,7 @@ class Timer {
 		this.startBtn.disabled = true;
 		this.pauseBtn.disabled = false;
 		this.stopBtn.disabled = false;
-		
+
 
 		this.updatingDisplayInterval = setInterval(() => {
 			this.updateDisplay();
@@ -209,8 +211,8 @@ class Timer {
 		this.startUpdatingDisplay();
 		const timerId = +this.timerContainer.dataset.id;
 		fetch(window.refreshTimer, {
-			body:JSON.stringify({timerId}),
-			method:"POST",
+			body: JSON.stringify({ timerId }),
+			method: "POST",
 			headers: {
 				'Content-Type': 'application/json',
 			}
@@ -229,9 +231,9 @@ class Timer {
 
 	updateCssClasses() {
 		const circleRunningClass = this.cssClasses.timerCircleRunning
-		
+
 		if (
-			this.isRunning 
+			this.isRunning
 			&& !this.timerCircle.classList.contains(circleRunningClass)
 		) {
 			this.timerCircle.classList.add(circleRunningClass)
@@ -241,7 +243,7 @@ class Timer {
 			!this.isRunning
 			&& this.timerCircle.classList.contains(circleRunningClass)
 		) {
-				this.timerCircle.classList.remove(circleRunningClass)
-			}
+			this.timerCircle.classList.remove(circleRunningClass)
+		}
 	}
 }
