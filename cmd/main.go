@@ -38,6 +38,7 @@ func main() {
 
 	mux.HandleFunc("/", timerHandler.RenderUserTimers)
 	port := env.Get("APP_PORT", "8080")
+	fmt.Println("App started on port " + port)
 	log.Fatal(http.ListenAndServe(":"+port, mux))
 }
 

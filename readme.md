@@ -8,7 +8,7 @@ build migration binary, e.g:
 `cd migrations`
 `go build -o goose-custom *.go`
 then run it
-`./goose-custom mysql up`
+`m/goose-custom mysql up`
 
 ## TODO
 
@@ -18,7 +18,7 @@ then run it
 * ~~разобраться почему при перезагрузке страницы показывает таймер запускающийся заново каждый раз~~
 * ~~сделать чтобы при удалении таймеры не сразу меняли положение, а было как в firefox - спустя 1.5 секунды~~ (такой херней заниматься нет желания - не сделано)
 * add report button in dev mode - ? (the idea is to accept report messages and send user id and all his data so i can replicate bug - mb its too much for a fucking timer app)
-* ~~добавить выбор цвета?~~ 
+* ~~добавить выбор цвета?~~
 * добавить в миграции поддержку sqlite - ?
 
 

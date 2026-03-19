@@ -1,11 +1,11 @@
 package db
 
-type TimerCategory struct {
+type Category struct {
 	TableName string
 }
 
-func (this *TimerCategory) New() *TimerCategory {
-	return &TimerCategory{
-		TableName: "timer_categories",
+func (this *Category) New() *Category {
+	return &Category{
+		TableName: "categories",
 	}
 }

@@ -65,6 +65,51 @@ func (this *Timer) GetAllUsersTimers(userID int) []interfaces.Timer {
 	return userTimers
 }
 
+func (this *Timer) GetAllUserTimersWithSection(userID int) ([]interfaces.TimerSectionTemplate, error) {
+
+	db := Db{}
+	err := db.Connect()
+	defer db.Db.Close()
+	if err != nil {
+		panic(err.Error())
+	}
+	tx := db.Db.MustBegin()
+
+	userId := strconv.Itoa(userID)
+	res, err := db.Db.Queryx(fmt.Sprintf("select * from mimer_sections ts inner join timer_categories tc on ts.user_id = tc.user_id where user_id = %s order by start", userId))
+
+	if err != nil {
+		panic(err.Error())
+	}
+
+	var userTimers []interfaces.Timer
+	for res.Next() {
+		userTimer := interfaces.NewTimer(0, "", "")
+		err := res.StructScan(&userTimer)
+		if err != nil {
+			log.Fatal(err.Error())
+		}
+		var duration int64
+		duration = 0
+
+		if userTimer.RunningSince.Valid {
+			fmt.Println("Time is valid", duration)
+			duration = time.Now().Unix() - userTimer.RunningSince.Time.Unix() + userTimer.Duration
+		} else {
+			fmt.Println("Time is invalid", duration)
+			duration = userTimer.Duration
+		}
+		userTimer.FormattedDuration = services.FormatTimerDuration(duration)
+
+		userTimers = append(userTimers, userTimer)
+	}
+	// fmt.Printf("User timers: %v\n", userTimers)
+
+	tx.Commit()
+
+	return userTimers, nil
+}
+
 func (this *Db) CreateTimer(timer interfaces.Timer) (int64, error) {
 	db := Db{}
 	err := db.Connect()

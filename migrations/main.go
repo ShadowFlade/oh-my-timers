@@ -41,7 +41,7 @@ func main() {
 	fmt.Println(curDir, " CURRENT DIRECOTRY")
 
 	if err := env.Load(curDir); err != nil {
-		panic(err)
+		panic(err);
 	}
 	dbstring := env.Get("GOOSE_DBSTRING", "")
 

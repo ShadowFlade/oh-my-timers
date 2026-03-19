@@ -30,12 +30,14 @@ func (this *TimerHandler) RenderUserTimers(w http.ResponseWriter, r *http.Reques
 
 	userIdCookie, err := r.Cookie(global.COOKIE_USER_ID_NAME)
 	if err != nil || userIdCookie.Value == "0" {
-		templates.ExecuteTemplate(w, "index", interfaces.TimerTemplate{
-			Items:                   make([]interfaces.Timer, 0),
-			IsMoreThan10:            false,
-			UserID:                  0,
-			ShowNewUserAlertTrigger: false,
-		})
+		templates.ExecuteTemplate(w,
+			"index",
+			interfaces.TimerTemplate{
+				Items:                   make([]interfaces.Timer, 0),
+				IsMoreThan10:            false,
+				UserID:                  0,
+				ShowNewUserAlertTrigger: false,
+			})
 		return
 	} else {
 		userIdVal = userIdCookie.Value

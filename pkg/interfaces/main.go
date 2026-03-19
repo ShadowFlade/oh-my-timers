@@ -22,6 +22,14 @@ type Timer struct {
 	Color             string       `db:"color"`
 	Id                int64        `db:"id"`
 	FormattedDuration string
+	SectionId         int64 `db:"section_id"`
+}
+
+type TimerSection struct {
+	UserId       sql.NullInt64 `db:"user_id"`
+	Name         string        `db:"name"`
+	DateInserted time.Time     `db:"date_inserted"`
+	DateUpdated  time.Time     `db:"date_modified"`
 }
 
 type TimerTemplate struct {
@@ -29,6 +37,12 @@ type TimerTemplate struct {
 	IsMoreThan10            bool
 	UserID                  int
 	ShowNewUserAlertTrigger bool
+}
+
+type TimerSectionTemplate struct {
+	Name   string
+	Items  []Timer
+	UserId int64
 }
 
 func NewTimer(userId int32, title string, color string) Timer {
@@ -85,14 +99,14 @@ func (this *JsonResponse) String() string {
 	return string(jsonBytes)
 }
 
-type TimerCategory struct {
+type Category struct {
 	id    int64  `db:"id"`
 	Name  string `db:"name"`
 	Color string `db:"color"`
 }
 
-func (this *TimerCategory) New(name string, color string) *TimerCategory {
-	timerCategory := &TimerCategory{}
+func (this *Category) New(name string, color string) *Category {
+	timerCategory := &Category{}
 	timerCategory.Name = name
 	timerCategory.Color = color
 
