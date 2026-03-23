@@ -1,9 +1,16 @@
 {{ block "timers" . }}
+<div class="js-root">
     {{ template "newTimer" .}}
-
-    <div class="timers js-timers">
-        {{ range .Items }}
-            {{ template "timer" .}}
-        {{ end }}
+    <div class="sections js-sections">
+    {{ range .}}
+        {{ template "newTimer" .}}
+        <div class="section js-section">{{.Name}}</div>
+        <div class="timers js-timers">
+            {{ range .Items }}
+                {{ template "timer" .}}
+            {{ end }}
+        </div>
+    {{ end }}
     </div>
+</div>
 {{ end }}

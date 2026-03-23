@@ -23,6 +23,7 @@ class Timer {
 	 * @param {HTMLElement} dataContainer
 	 */
 	setupState(dataContainer) {
+		console.log(dataContainer,' data container');
 		this.timerCircle = this.timerContainer.querySelector('.js-timer-circle')
 		this.timerDisplay = this.timerContainer.querySelector('.js-timer-display');
 		this.startBtn = this.timerContainer.querySelector('.js-start-btn');

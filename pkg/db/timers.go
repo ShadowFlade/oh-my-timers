@@ -31,7 +31,7 @@ func (this *Timer) GetAllUsersTimers(userID int) []interfaces.Timer {
 	tx := db.Db.MustBegin()
 
 	userId := strconv.Itoa(userID)
-	res, err := db.Db.Queryx(fmt.Sprintf("select * from timers where user_id = %s order by start", userId))
+	res, err := db.Db.Queryx(fmt.Sprintf("select * from user_timers where user_id = %s order by start", userId))
 
 	if err != nil {
 		panic(err.Error())
@@ -76,16 +76,32 @@ func (this *Timer) GetAllUserTimersWithSection(userID int) ([]interfaces.TimerSe
 	tx := db.Db.MustBegin()
 
 	userId := strconv.Itoa(userID)
-	res, err := db.Db.Queryx(fmt.Sprintf("select * from mimer_sections ts inner join timer_categories tc on ts.user_id = tc.user_id where user_id = %s order by start", userId))
+	res, err := db.Db.Queryx(fmt.Sprintf(`
+		select
+			s.name section_name,t.title title, s.color section_color, t.color timer_color, t.id timer_id, s.id section_id
+		from section s
+		inner join timer_section ts on ts.user_id = ts.user_id
+		inner join users u on ts.user_id = u.id
+		inner join timers t on t.id = ts.timer_id
+		where ts.user_id = %s
+		order by t.id asc;
+	`,
+		userId))
 
 	if err != nil {
 		panic(err.Error())
 	}
 
+	var userSections []interfaces.Section
 	var userTimers []interfaces.Timer
+
 	for res.Next() {
 		userTimer := interfaces.NewTimer(0, "", "")
-		err := res.StructScan(&userTimer)
+		userSection := interfaces.NewSection(int32(userID), "", "")
+		log.Println("user section")
+
+		log.Println(userSection)
+		err := res.StructScan(&userSection)
 		if err != nil {
 			log.Fatal(err.Error())
 		}
@@ -102,15 +118,19 @@ func (this *Timer) GetAllUserTimersWithSection(userID int) ([]interfaces.TimerSe
 		userTimer.FormattedDuration = services.FormatTimerDuration(duration)
 
 		userTimers = append(userTimers, userTimer)
+		userSections = append(userSections, *userSection)
 	}
+	log.Println("user sections")
+	log.Println(userTimers)
+	var sectionTemplates []interfaces.TimerSectionTemplate
+	//timerSectionTemplate := interfaces.NewSectionTemplate()
 	// fmt.Printf("User timers: %v\n", userTimers)
 
 	tx.Commit()
-
-	return userTimers, nil
+	return sectionTemplates, nil
 }
 
-func (this *Db) CreateTimer(timer interfaces.Timer) (int64, error) {
+func (this *Db) CreateTimer(timer interfaces.Timer, sectionId int) (int64, error) {
 	db := Db{}
 	err := db.Connect()
 	if err != nil {
@@ -158,6 +178,15 @@ func (this *Db) CreateTimer(timer interfaces.Timer) (int64, error) {
 		return 0, fmt.Errorf("failed to commit transaction: %w", err)
 	}
 
+	sectionQuery := fmt.Sprintf(`
+	insert into timer_section (user_id, timer_id, section_id) values (?, ?, ?, ?);
+	`, timer.UserID, newId, sectionId,
+	)
+	_, err = tx.Exec(sectionQuery)
+
+	if err != nil {
+		return 0, err
+	}
 	// Set tx to nil to prevent defer from rolling back
 	tx = nil
 	return newId, nil

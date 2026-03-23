@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"flag"
-	"fmt"
 	"log"
 	"os"
 	"path/filepath"
@@ -38,10 +37,9 @@ func main() {
 
 	command := args[1]
 	curDir, err = filepath.Abs(curDir + "/.env")
-	fmt.Println(curDir, " CURRENT DIRECOTRY")
 
 	if err := env.Load(curDir); err != nil {
-		panic(err);
+		panic(err)
 	}
 	dbstring := env.Get("GOOSE_DBSTRING", "")
 

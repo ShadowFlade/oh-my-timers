@@ -9,7 +9,6 @@ class TimerManager {
 		this.timersContainer = timersContainer;
 
 		this.addTimerBtn = document.querySelector('.js-new-timer__button');
-		this.timersContainer = document.querySelector('.js-timers');
 
 		this.bindEvents();
 		this.initTimers();
@@ -61,13 +60,19 @@ class TimerManager {
 		return !!triggerHiddenInput;
 	}
 
-	async addTimer() {
+	async addTimer(container = null) {
 		let newTimerHtml = '';
+		if(container) {
+			sectionId = container.sectionId
+		} else {
+			sectionId = 0
+		}
 		const resp = await fetch(window.createTimer, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
 			},
+			body: JSON.stringify({sectionId})
 		});
 		newTimerHtml = await resp.text();
 

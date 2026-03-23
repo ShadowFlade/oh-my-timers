@@ -33,7 +33,7 @@ func (this *TimerHandler) RenderUserTimers(w http.ResponseWriter, r *http.Reques
 		templates.ExecuteTemplate(w,
 			"index",
 			interfaces.TimerTemplate{
-				Items:                   make([]interfaces.Timer, 0),
+				Items:                   make([]interfaces.Section, 0),
 				IsMoreThan10:            false,
 				UserID:                  0,
 				ShowNewUserAlertTrigger: false,
@@ -46,14 +46,9 @@ func (this *TimerHandler) RenderUserTimers(w http.ResponseWriter, r *http.Reques
 
 	userId, err = strconv.Atoi(userIdVal)
 
-	userTimers := timersDb.GetAllUsersTimers(userId)
+	timerSections, err := timersDb.GetAllUserTimersWithSection(userId)
 	w.Header().Set("Access-Control-Allow-Credentials", "true")
-	templates.ExecuteTemplate(w, "index", interfaces.TimerTemplate{
-		Items:                   userTimers,
-		IsMoreThan10:            false,
-		UserID:                  userId,
-		ShowNewUserAlertTrigger: false,
-	})
+	templates.ExecuteTemplate(w, "index", timerSections)
 
 }
 
@@ -79,7 +74,15 @@ func (this *TimerHandler) CreateTimer(w http.ResponseWriter, r *http.Request) {
 	userTimers := make([]interfaces.Timer, 1, 1)
 	userTimers = append(userTimers, newTimer)
 
-	newTimerID, err := db.CreateTimer(newTimer)
+	body, _ := io.ReadAll(r.Body)
+	var response map[string]interface{}
+	json.Unmarshal(body, &response)
+	sectionId, err := strconv.Atoi(response["sectionId"].(string))
+	panic(sectionId)
+	if err != nil {
+		panic(err)
+	}
+	newTimerID, err := db.CreateTimer(newTimer, sectionId)
 
 	if err != nil {
 		panic(err.Error())
@@ -87,9 +90,11 @@ func (this *TimerHandler) CreateTimer(w http.ResponseWriter, r *http.Request) {
 	newTimer.Id = newTimerID
 
 	templates.ExecuteTemplate(w, "timer", newTimer)
+
 	if err != nil {
 		fmt.Print(err.Error(), userID, newTimerID)
 	}
+
 }
 
 func (this *TimerHandler) StartTimer(w http.ResponseWriter, r *http.Request) {

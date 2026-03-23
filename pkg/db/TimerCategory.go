@@ -6,6 +6,6 @@ type Category struct {
 
 func (this *Category) New() *Category {
 	return &Category{
-		TableName: "categories",
+		TableName: "section",
 	}
 }

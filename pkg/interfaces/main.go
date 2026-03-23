@@ -25,15 +25,50 @@ type Timer struct {
 	SectionId         int64 `db:"section_id"`
 }
 
-type TimerSection struct {
-	UserId       sql.NullInt64 `db:"user_id"`
-	Name         string        `db:"name"`
-	DateInserted time.Time     `db:"date_inserted"`
-	DateUpdated  time.Time     `db:"date_modified"`
+type Section struct {
+	UserId       int32     `db:"user_id"`
+	Name         string    `db:"name"`
+	DateInserted time.Time `db:"date_inserted"`
+	DateUpdated  time.Time `db:"date_modified"`
+	Color        string    `db:"color"`
+}
+
+func NewSection(userId int32, name string, color string) *Section {
+	if color == "" {
+		color = "green"
+	}
+
+	return &Section{
+		UserId:       userId,
+		Name:         name,
+		Color:        color,
+		DateInserted: time.Now(),
+	}
+}
+
+type SectionTemplate struct {
+	Items                   []TimerTemplate
+	Name                    string
+	Id                      int32
+	UserID                  int
+	ShowNewUserAlertTrigger bool
+	IsMoreThan10            bool
+	Color                   string
+}
+
+func NewSectionTemplate(items []TimerTemplate, name string, id int32, userId int, ShowNewUserAlertTrigger bool, IsMoreThan10 bool) *SectionTemplate {
+	return &SectionTemplate{
+		IsMoreThan10:            IsMoreThan10,
+		ShowNewUserAlertTrigger: ShowNewUserAlertTrigger,
+		UserID:                  userId,
+		Id:                      id,
+		Name:                    name,
+		Items:                   items,
+	}
 }
 
 type TimerTemplate struct {
-	Items                   []Timer
+	Items                   []Section
 	IsMoreThan10            bool
 	UserID                  int
 	ShowNewUserAlertTrigger bool
@@ -43,6 +78,7 @@ type TimerSectionTemplate struct {
 	Name   string
 	Items  []Timer
 	UserId int64
+	Id     int
 }
 
 func NewTimer(userId int32, title string, color string) Timer {
@@ -97,18 +133,4 @@ func (this *JsonResponse) String() string {
 	}
 
 	return string(jsonBytes)
-}
-
-type Category struct {
-	id    int64  `db:"id"`
-	Name  string `db:"name"`
-	Color string `db:"color"`
-}
-
-func (this *Category) New(name string, color string) *Category {
-	timerCategory := &Category{}
-	timerCategory.Name = name
-	timerCategory.Color = color
-
-	return timerCategory
 }

@@ -8,7 +8,7 @@ build migration binary, e.g:
 `cd migrations`
 `go build -o goose-custom *.go`
 then run it
-`m/goose-custom mysql up`
+`goose-custom mysql up`
 
 ## TODO
 

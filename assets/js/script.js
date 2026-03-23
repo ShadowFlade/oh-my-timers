@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
-	const timersContainer = document.querySelector('.js-timers')
+	const timersContainer = document.querySelector('.js-root')
 	const timersManager = new TimerManager(timersContainer);
 })
 
