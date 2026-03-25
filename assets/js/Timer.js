@@ -54,8 +54,8 @@ class Timer {
 		this.colorPicker.addEventListener('change', this.handleTimerColorChange.bind(this))
 	}
 	/**
-	 * 
-	 * @param {Event} e 
+	 *
+	 * @param {Event} e
 	 */
 	handleTimerColorChange(e) {
 		const newColor = e.currentTarget.value;

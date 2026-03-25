@@ -1,6 +1,7 @@
 package db
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"strconv"
@@ -120,8 +121,9 @@ func (this *Timer) GetAllUserTimersWithSection(userID int) ([]interfaces.TimerSe
 		userTimers = append(userTimers, userTimer)
 		userSections = append(userSections, *userSection)
 	}
+
 	log.Println("user sections")
-	log.Println(userTimers)
+	log.Println(userSections)
 	var sectionTemplates []interfaces.TimerSectionTemplate
 	//timerSectionTemplate := interfaces.NewSectionTemplate()
 	// fmt.Printf("User timers: %v\n", userTimers)
@@ -149,7 +151,7 @@ func (this *Db) CreateTimer(timer interfaces.Timer, sectionId int) (int64, error
 	}()
 
 	query := `
-	insert into timers (start, end, user_id, title, color, date_inserted, duration) values (:start, :end, :user_id, :title, :color, :date_inserted, :duration)
+	insert into timers (start, end, user_id, title, color, date_inserted, duration) values (:start, :end, :user_id, :title, :color, :date_inserted, :duration);
 	`
 
 	result, err := tx.NamedExec(query, timer)
@@ -178,6 +180,19 @@ func (this *Db) CreateTimer(timer interfaces.Timer, sectionId int) (int64, error
 		return 0, fmt.Errorf("failed to commit transaction: %w", err)
 	}
 
+	if sectionId == 0 {
+		sectionQuery := `select id from section where name = 'general';`
+		res, err := tx.Query(sectionQuery)
+		var generalSectionId int
+		res.Scan(generalSectionId)
+
+		if err != nil {
+			return 0, err
+		}
+
+		log.Println(strconv.Itoa(generalSectionId) + " rows affected when creating selecting general section")
+		sectionId = generalSectionId
+	}
 	sectionQuery := fmt.Sprintf(`
 	insert into timer_section (user_id, timer_id, section_id) values (?, ?, ?, ?);
 	`, timer.UserID, newId, sectionId,
