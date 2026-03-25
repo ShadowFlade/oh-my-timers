@@ -5,10 +5,11 @@ This code style is disapproved by golang community and myself (i just love `this
 ### Start project
 `air`
 build migration binary, e.g:
-`cd migrations`
-`go build -o goose-custom *.go`
+`go build -o goose-custom ./migrations`
 then run it
 `goose-custom mysql up`
+or just
+`just migrate`
 
 ## TODO
 
