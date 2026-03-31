@@ -78,7 +78,7 @@ class Timer {
 			return;
 		}
 		fetch(window.updateTimerTitle, {
-			body: JSON.stringify({ newTitle, id: timerId }),
+			body: JSON.stringify({ newitle, id: timerId }),
 			method: "POST",
 			headers: {
 				'Content-Type': 'application/json',

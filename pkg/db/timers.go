@@ -1,7 +1,6 @@
 package db
 
 import (
-	"context"
 	"fmt"
 	"log"
 	"strconv"
@@ -79,7 +78,7 @@ func (this *Timer) GetAllUserTimersWithSection(userID int) ([]interfaces.TimerSe
 	userId := strconv.Itoa(userID)
 	res, err := db.Db.Queryx(fmt.Sprintf(`
 		select
-			s.name section_name,t.title title, s.color section_color, t.color timer_color, t.id timer_id, s.id section_id
+			s.name name,t.title title, s.color section_color, t.color timer_color, t.id timer_id, s.id section_id
 		from section s
 		inner join timer_section ts on ts.user_id = ts.user_id
 		inner join users u on ts.user_id = u.id
@@ -102,18 +101,16 @@ func (this *Timer) GetAllUserTimersWithSection(userID int) ([]interfaces.TimerSe
 		log.Println("user section")
 
 		log.Println(userSection)
-		err := res.StructScan(&userSection)
-		if err != nil {
-			log.Fatal(err.Error())
-		}
+		//err := res.StructScan(&userSection)
+		userSectionMap := make(map[string]any)
+		res.MapScan(userSectionMap)
+		fmt.Printf("%#v user seciton map",userSectionMap)
+		fmt.Println("map: ", userSectionMap)
 		var duration int64
-		duration = 0
 
 		if userTimer.RunningSince.Valid {
-			fmt.Println("Time is valid", duration)
 			duration = time.Now().Unix() - userTimer.RunningSince.Time.Unix() + userTimer.Duration
 		} else {
-			fmt.Println("Time is invalid", duration)
 			duration = userTimer.Duration
 		}
 		userTimer.FormattedDuration = services.FormatTimerDuration(duration)
@@ -193,6 +190,7 @@ func (this *Db) CreateTimer(timer interfaces.Timer, sectionId int) (int64, error
 		log.Println(strconv.Itoa(generalSectionId) + " rows affected when creating selecting general section")
 		sectionId = generalSectionId
 	}
+
 	sectionQuery := fmt.Sprintf(`
 	insert into timer_section (user_id, timer_id, section_id) values (?, ?, ?, ?);
 	`, timer.UserID, newId, sectionId,

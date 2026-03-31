@@ -45,7 +45,6 @@ func (this *TimerHandler) RenderUserTimers(w http.ResponseWriter, r *http.Reques
 	}
 
 	userId, err = strconv.Atoi(userIdVal)
-
 	timerSections, err := timersDb.GetAllUserTimersWithSection(userId)
 	w.Header().Set("Access-Control-Allow-Credentials", "true")
 	templates.ExecuteTemplate(w, "index", timerSections)
@@ -197,21 +196,25 @@ func (this *TimerHandler) UpdateTimerTitle(w http.ResponseWriter, r *http.Reques
 func (this *TimerHandler) AddUpdateTimerColor(w http.ResponseWriter, r *http.Request) {
 	db := db.Db{}
 	reqBody, _ := io.ReadAll(r.Body)
-	var body map[string]interface{}
+	var body map[string]any
 	json.Unmarshal(reqBody, &body)
 	color := body["color"].(string)
 	timerId, err := strconv.Atoi(body["id"].(string))
+
 	if err != nil {
 		panic(err)
 	}
+
 	if color == "" || timerId == 0 {
 		return
 	}
 
 	affectedId, err := db.AddOrUpdateTimerColor(timerId, color)
+
 	if err != nil {
 		log.Panicf("Could not update timer title. Color: %s. Error: %s", color, err.Error())
 	}
+
 	resp := interfaces.JsonResponse{
 		IsSuccess: true,
 		Data:      affectedId,
